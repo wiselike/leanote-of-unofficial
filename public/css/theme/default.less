@@ -1,0 +1,56 @@
+@import "basic.less";
+
+.folderBody a:hover, .folderBody .contextmenu-hover {
+	color: #fff;
+	background-color: rgba(0,0,0,0.1) !important;
+}
+.folderBody a.active, .folderBody a.active:hover {
+  background-color: #25313e !important; // @bgColor;
+  color: #fff; // @hColor;
+}
+
+//----------------------
+#searchNotebookForList {
+  color: #ccc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: @notebookBodyBgColor;
+  &:focus {
+  	outline: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+	box-shadow: none;
+  }
+}
+.label-default {
+	background-color: #191D2B;
+}
+#myShareNotebooks .folderBody {
+	background: none;
+}
+.tmpzTreeMove_arrow {
+	color: #fff;
+}
+
+.ztree > li {
+  border-bottom: 1px solid transparent;
+  border-color: rgba(255,255,255,0.05);
+}
+.ztree li a.curSelectedNode {
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 3px;
+  color: #fff;
+}
+.ztree li a {
+  color: #ADBECE;
+}
+
+.ztree li a.tmpTargetNode_inner {
+  padding-top:0px; 
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fff; 
+  height: 30px; 
+  border:1px #ccc solid;
+  opacity: 0.8; 
+  filter:alpha(opacity=80)
+}
+
+@import "mobile.less";
