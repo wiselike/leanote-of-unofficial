@@ -1716,6 +1716,7 @@ Note.toggleReadOnly = function(needSave) {
 		return Note.toggleWriteable();
 	}
 
+	$('#left-column').hide();
 	var me = this;
 	var note = me.getCurNote();
 
@@ -1771,6 +1772,7 @@ LEA.toggleWriteable = Note.toggleWriteable = function(isFromNewNote) {
 	// markdown
 	$('#mdEditor').removeClass('read-only');
 
+	$('#left-column').show();
 	var note = me.getCurNote();
 	if(!note) {
 		return;
