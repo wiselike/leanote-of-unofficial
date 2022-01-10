@@ -19,6 +19,7 @@
 <link href="/public/md/themes/default.css" rel="stylesheet" />
 <!-- context-menu -->
 <link rel="stylesheet" href="/js/contextmenu/css/contextmenu-min.css?id=1" type="text/css" />
+<link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
 <script>
 var hash = location.hash;
 if(hash.indexOf("writing") >= 0) {
@@ -867,7 +868,12 @@ window.require = {
     baseUrl: '/public',
 };
 </script>
-<script src="/js/markdown-v2.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/mermaid/8.11.2/mermaid.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/3.5.0/chart.min.js"></script>
+<script src="/js/require.js"></script>
+<script src="/public/md/main-v2.js"></script>
+
+<!-- <script src="/js/markdown-v2.min.js"></script> -->
 <script src="/public/js/plugins/main.min.js"></script>
 </body>
 </html>

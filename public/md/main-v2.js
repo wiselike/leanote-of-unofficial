@@ -12075,7 +12075,7 @@ SmartyPants does not modify characters within <pre>, <code>, <kbd>, or <script> 
         editor.hooks.chain("onPreviewRefresh", function () {
             $('#preview-contents pre code').each(function () {
                 var classes = $(this).attr('class');
-                if (classes != 'language-flow' && classes != 'language-sequence') {
+                if (classes != 'language-flow' && classes != 'language-sequence' && classes != 'language-mermaid' && classes != 'language-chart') {
                     $(this).parent().addClass('prettyprint linenums');
                 }
             });
@@ -12658,34 +12658,63 @@ define('extensions/umlDiagrams', [
         });
     }
 
-    function renderFlow() {
-        var flows = previewContentsElt.querySelectorAll('.prettyprint > .language-flow');
-        if (!flows || flows.length == 0) {
+    function renderChart() {
+        var c = previewContentsElt.querySelectorAll('.prettyprint > .language-chart');
+        if (!c || c.length == 0) {
             return;
         }
-        // console.log('flows')
-        require(['flow-chart'], function (flowChart) {
-            _.each(flows, function (elt) {
-                try {
-                    var chart = flowChart.parse(elt.textContent);
-                    var preElt = elt.parentNode;
-                    var containerElt = crel('div', {
-                        class: 'flow-chart'
-                    });
-                    preElt.parentNode.replaceChild(containerElt, preElt);
-                    chart.drawSVG(containerElt, JSON.parse(umlDiagrams.config.flowchartOptions));
-                }
-                catch (e) {
-                    console.error(e);
-                }
-            });
+        //   console.log(c);
+        //   require(['chart'], function (chart) {
+        _.each(c, function (elt) {
+            try {
+                var jsonObject = JSON.parse(elt.textContent);
+                var preElt = elt.parentNode;
+                var containerElt = crel('canvas', {
+                    //class: 'flow-chart'
+                });
+                preElt.parentNode.replaceChild(containerElt, preElt);
+                var ctx = containerElt.getContext('2d');
+                new Chart(ctx, jsonObject);
+            }
+            catch (e) {
+                console.error(e);
+            }
+			   
         });
+        //   });
+    }
+
+    function renderMermaid() {
+        var mer = previewContentsElt.querySelectorAll('.prettyprint > .language-mermaid');
+        if (!mer || mer.length == 0) {
+            return;
+        }
+
+        //loadJs('https://cdn.bootcss.com/mermaid/7.1.2/mermaid.js', function () {
+        _.each(mer, function (elt) {
+            try {
+                var text = elt.textContent;
+                var preElt = elt.parentNode;
+                var containerElt = crel('div', {
+                    class: 'mermaid flow-chart',
+                    style: 'max-width: 960px; margin:0 auto;'
+                }, text);
+                preElt.parentNode.replaceChild(containerElt, preElt);
+                mermaid.init({ noteMargin: 10 }, ".mermaid");
+            }
+            catch (e) {
+                console.error(e);
+            }
+        });
+        //});
     }
 
     function onToggleMode(editor) {
         editor.hooks.chain("onPreviewRefresh", function () {
             renderSequence();
             renderFlow();
+            renderMermaid();
+            renderChart();
         });
     }
 
@@ -12869,6 +12898,36 @@ define('extensions/emailConverter', [
     };
 
     return emailConverter;
+});
+
+define('extensions/emojiConverter', [
+    "classes/Extension",
+], function (Extension) {
+    var emojiConverter = new Extension("emojiConverter", "Markdown Emoji", true);
+    emojiConverter.onPagedownConfigure = function (editor) {
+        editor.getConverter().hooks.chain("postConversion", function (text) {
+            return text.replace(/:([-\w]+):/g, function (match, emoji) {
+                return '<i class="em em-' + emoji + '"></i>';
+            });
+        });
+    };
+
+    return emojiConverter;
+});
+
+define('extensions/containerConverter', [
+    "classes/Extension",
+], function (Extension) {
+    var converter = new Extension("containerConverter", "Markdown Container", true);
+    converter.onPagedownConfigure = function (editor) {
+        editor.getConverter().hooks.chain("postConversion", function (text) {
+            return text.replace(/::: (success|warning|info|danger) <br>\n(.+)\n:::/gm, function (match, level, context) {
+                return '<div class="' + level + '">' + context + '</div>';
+            });
+        });
+    };
+
+    return converter;
 });
 
 define('extensions/todoList', [
@@ -13882,6 +13941,8 @@ define('eventMgr', [
     "extensions/toc",
     "extensions/mathJax",
     "extensions/emailConverter",
+    "extensions/emojiConverter",
+    "extensions/containerConverter",
     "extensions/todoList",
     "extensions/scrollLink",
     "extensions/htmlSanitizer",
@@ -17193,6 +17254,20 @@ define('core', [
             $editorElt.val(initDocumentContent);
         }
 
+        aceEditor.getSession().on('change', function () {
+            content = getEditorContent(true)[0];
+            // msg = '字符数：' + content.length + ' 字数：' + calcWords(content);
+            msg = '字数：' + calcWords(content);
+            console.log(msg);
+            fmsg = '<div id="calcWords" tabindex="-1">' + msg + '</div>';
+            i = $('#wmd-button-bar').find('#calcWords');
+            if (i.length == 0) {
+                $('#wmd-button-bar').append(fmsg);
+            } else {
+                $(i[0]).html(msg).css({ "float": "right", "padding-right": "10px" });
+            }
+        });
+
         // If the editor is already created
         if (editor !== undefined) {
             if (!window.lightMode) {
@@ -17688,7 +17763,8 @@ requirejs.config({
         Diagram: 'libs/uml/sequence-diagram.min',
         'diagram-grammar': 'libs/uml/diagram-grammar.min',
         raphael: 'libs/uml/raphael.min',
-        'flow-chart': 'libs/uml/flowchart.amd-1.3.4.min'
+        'flow-chart': 'libs/uml/flowchart.amd-1.3.4.min',
+        //   'chart': 'js/chart.min'
     },
     shim: {
         underscore: {
