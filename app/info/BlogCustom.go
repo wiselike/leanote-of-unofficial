@@ -22,6 +22,7 @@ type BlogInfoCustom struct {
 
 type Post struct {
 	NoteId      string
+	NotebookId  string
 	Title       string
 	UrlTitle    string
 	ImgSrc      string
@@ -32,10 +33,12 @@ type Post struct {
 	Abstract    string
 	Content     string
 	Tags        []string
+	Cates       []map[string]string
 	CommentNum  int
 	ReadNum     int
 	LikeNum     int
 	IsMarkdown  bool
+	IsTop       bool
 }
 
 // 归档

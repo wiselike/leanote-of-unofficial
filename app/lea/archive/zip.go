@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+
 	"github.com/leanote/leanote/app/lea"
 )
 
@@ -140,20 +141,15 @@ func Unzip(srcFilePath string, destDirPath string) (ok bool, msg string) {
 
 	os.Mkdir(destDirPath, os.ModePerm)
 	r, err := zip.OpenReader(srcFilePath)
+	defer r.Close()
 	if err != nil {
+		fmt.Println("zip Open Reader ", err)
 		panic(err)
 	}
-	defer r.Close()
 	for _, f := range r.File {
-		// fmt.Println("FileName : ", f.Name); // j/aaa.zip
-		rc, err := f.Open()
-		if err != nil {
-			panic(err)
-		}
-
 		// 包含恶意目录
 		if strings.Contains(f.Name, "../") {
-			lea.LogW("恶意文件", f.Name);
+			lea.LogW("恶意文件", f.Name)
 			continue
 		}
 
@@ -174,6 +170,9 @@ func Unzip(srcFilePath string, destDirPath string) (ok bool, msg string) {
 		} else {
 			filename = f.Name
 		}
+		if filename == "" {
+			continue
+		}
 		//		fmt.Println(prePath)
 
 		// 相对于目标文件件下的路径
@@ -183,13 +182,22 @@ func Unzip(srcFilePath string, destDirPath string) (ok bool, msg string) {
 			destPath = destDirPath + "/" + prePath + "/" + filename
 		}
 		// Write data to file
-		//        fmt.Println(destPath)
-		fw, _ := os.Create(destPath)
+		rc, err := f.Open()
+		defer rc.Close()
 		if err != nil {
+			fmt.Println("FileName : ", f.Name, " open error: ", err)
+			panic(err)
+		}
+
+		fw, err := os.Create(destPath)
+		if err != nil {
+			fmt.Println("l:", l, "filename:", filename, "Paths:", paths, "f.Name:", f.Name)
+			fmt.Println("archieve.zip Unzp io.Create", err, "destPath: ", destPath)
 			panic(err)
 		}
 		_, err = io.Copy(fw, rc)
 		if err != nil {
+			fmt.Println("archive.zip Unzip io.Copy", err)
 			panic(err)
 		}
 	}

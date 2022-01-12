@@ -1,8 +1,9 @@
 package info
 
 import (
-	"gopkg.in/mgo.v2/bson"
 	"time"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 // 只为blog, 不为note
@@ -125,4 +126,6 @@ type BlogUrls struct {
 	ArchiveUrl  string
 	TagsUrl     string
 	TagPostsUrl string
+	CatesUrl    string
+	// CatePostUrl string
 }

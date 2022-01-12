@@ -1,13 +1,14 @@
 package service
 
 import (
+	"regexp"
+	"strings"
+	"time"
+
 	"github.com/leanote/leanote/app/db"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
-	"regexp"
-	"strings"
-	"time"
 )
 
 type NoteService struct {
@@ -83,7 +84,7 @@ func (this *NoteService) GetNoteBySrc(src, userId string) (note info.Note) {
 
 func (this *NoteService) GetNoteAndContentBySrc(src, userId string) (noteId string, noteAndContent info.NoteAndContentSep) {
 	note := this.GetNoteBySrc(src, userId)
-	if (note.NoteId != "") {
+	if note.NoteId != "" {
 		noteId = note.NoteId.Hex()
 		noteContent := this.GetNoteContent(note.NoteId.Hex(), userId)
 		return noteId, info.NoteAndContentSep{note, noteContent}
@@ -134,6 +135,7 @@ func (this *NoteService) ToApiNote(note *info.Note, files []info.NoteFile) info.
 		UserId:      note.UserId.Hex(),
 		Title:       note.Title,
 		Tags:        note.Tags,
+		Cates:       note.Cates,
 		IsMarkdown:  note.IsMarkdown,
 		IsBlog:      note.IsBlog,
 		IsTrash:     note.IsTrash,
@@ -196,12 +198,16 @@ func (this *NoteService) ListNotes(userId, notebookId string,
 	isTrash bool, pageNumber, pageSize int, sortField string, isAsc bool, isBlog bool) (count int, notes []info.Note) {
 	notes = []info.Note{}
 	skipNum, sortFieldR := parsePageAndSort(pageNumber, pageSize, sortField, isAsc)
+	sortFieldList := []string{}
 
 	// 不是trash的
 	query := bson.M{"UserId": bson.ObjectIdHex(userId), "IsTrash": isTrash, "IsDeleted": false}
 	if isBlog {
 		query["IsBlog"] = true
+		sortFieldList = append(sortFieldList, "-IsTop")
 	}
+	sortFieldList = append(sortFieldList, sortFieldR)
+	
 	if notebookId != "" {
 		query["NotebookId"] = bson.ObjectIdHex(notebookId)
 	}
@@ -211,7 +217,7 @@ func (this *NoteService) ListNotes(userId, notebookId string,
 	// 总记录数
 	count, _ = q.Count()
 
-	q.Sort(sortFieldR).
+	q.Sort(sortFieldList...).
 		Skip(skipNum).
 		Limit(pageSize).
 		All(&notes)
@@ -287,6 +293,9 @@ func (this *NoteService) AddNote(note info.Note, fromApi bool) info.Note {
 	note.Usn = userService.IncrUsn(note.UserId.Hex())
 
 	notebookId := note.NotebookId.Hex()
+
+	// 添加Note的分类信息
+	note.Cates = notebookService.GetNotebookIdsAndTitles(notebookId, note.UserId.Hex())
 
 	// api会传IsBlog, web不会传
 	if !fromApi {
@@ -445,13 +454,13 @@ func (this *NoteService) UpdateNote(updatedUserId, noteId string, needUpdate bso
 	}
 
 	/*
-	// 这里不再判断, 因为controller已经判断了, 删除附件会新增, 所以不用判断
-	if usn > 0 && note.Usn != usn {
-		Log("有冲突!!")
-		Log(note.Usn)
-		Log(usn)
-		return false, "conflict", 0
-	}
+		// 这里不再判断, 因为controller已经判断了, 删除附件会新增, 所以不用判断
+		if usn > 0 && note.Usn != usn {
+			Log("有冲突!!")
+			Log(note.Usn)
+			Log(usn)
+			return false, "conflict", 0
+		}
 	*/
 
 	// 是否已自定义
@@ -688,6 +697,7 @@ func (this *NoteService) MoveNote(noteId, notebookId, userId string) info.Note {
 			bson.M{"$set": bson.M{"IsTrash": false,
 				"NotebookId": bson.ObjectIdHex(notebookId),
 				"Usn":        userService.IncrUsn(userId),
+				"Cates":      notebookService.GetNotebookIdsAndTitles(notebookId, userId), // 更新Note的分类信息
 			}})
 
 		if re {
@@ -1079,7 +1089,7 @@ func (this *NoteService) FixContent(content string, isMarkdown bool) string {
 	patterns := []map[string]string{
 		map[string]string{"src": "src", "middle": "/api/file/getImage", "param": "fileId", "to": "getImage?fileId="},
 		map[string]string{"src": "src", "middle": "/file/outputImage", "param": "fileId", "to": "getImage?fileId="},
-		
+
 		map[string]string{"src": "href", "middle": "/attach/download", "param": "attachId", "to": "getAttach?fileId="},
 		map[string]string{"src": "href", "middle": "/api/file/getAtach", "param": "fileId", "to": "getAttach?fileId="},
 

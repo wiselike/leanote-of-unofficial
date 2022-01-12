@@ -76,6 +76,7 @@ GET		/blog/view/:noteId			Blog.Post
 GET		/blog/single/:userIdOrEmail/:singleId			Blog.Single
 GET		/blog/single/:singleId			Blog.Single
 
+GET     /blog/cates/:userIdOrEmail Blog.Cates
 GET		/blog/cate/:notebookId		Blog.Cate
 GET		/blog/cate/:userIdOrEmail/:notebookId		Blog.Cate
 
@@ -106,6 +107,7 @@ GET		/preview/post/:userIdOrEmail/:noteId			Preview.Post
 GET		/preview/single/:userIdOrEmail/:singleId			Preview.Single
 GET		/preview/single/:singleId			Preview.Single
 
+GET     /preview/cates/:userIdOrEmail   Preview.Cates
 GET		/preview/cate/:notebookId		Preview.Cate
 GET		/preview/cate/:userIdOrEmail/:notebookId		Preview.Cate
 
