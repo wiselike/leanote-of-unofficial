@@ -1,11 +1,16 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
 	"strings"
+
+	"github.com/revel/revel"
+
 	//	"encoding/json"
 	"fmt"
+	"sort"
+
 	"github.com/leanote/leanote/app/info"
+
 	// . "github.com/leanote/leanote/app/lea"
 	"github.com/leanote/leanote/app/lea/blog"
 	"gopkg.in/mgo.v2/bson"
@@ -124,6 +129,7 @@ func (c Blog) setPreviewUrl() {
 	singleUrl = blogUrl + "/single/" + userIdOrEmail    // blog.leanote.com/single/singleId
 	archiveUrl = blogUrl + "/archives/" + userIdOrEmail // blog.leanote.com/archive/userId
 	tagsUrl = blogUrl + "/tags/" + userIdOrEmail        // blog.leanote.com/archive/userId
+	catesUrl := blogUrl + "/cates/" + userIdOrEmail
 
 	c.ViewArgs["indexUrl"] = indexUrl
 	c.ViewArgs["cateUrl"] = cateUrl
@@ -135,6 +141,7 @@ func (c Blog) setPreviewUrl() {
 	c.ViewArgs["tagsUrl"] = tagsUrl
 	c.ViewArgs["tagPostsUrl"] = blogUrl + "/tag/" + userIdOrEmail
 	c.ViewArgs["tagUrl"] = c.ViewArgs["tagPostsUrl"]
+	c.ViewArgs["catesUrl"] = catesUrl
 
 	// themeBaseUrl 本theme的路径url, 可以加载js, css, images之类的
 	c.ViewArgs["themeBaseUrl"] = "/" + theme.Path
@@ -163,6 +170,7 @@ func (c Blog) setUrl(userBlog info.UserBlog, userInfo info.User) {
 	c.ViewArgs["tagsUrl"] = blogUrls.TagsUrl
 	c.ViewArgs["tagPostsUrl"] = blogUrls.TagPostsUrl
 	c.ViewArgs["tagUrl"] = blogUrls.TagPostsUrl // 别名
+	c.ViewArgs["catesUrl"] = blogUrls.CatesUrl
 
 	// themeBaseUrl 本theme的路径url, 可以加载js, css, images之类的
 	c.ViewArgs["themeBaseUrl"] = "/" + userBlog.ThemePath
@@ -184,90 +192,129 @@ func (c Blog) setUrl(userBlog info.UserBlog, userInfo info.User) {
 	c.ViewArgs["bootstrapJsUrl"] = "/js/bootstrap-min.js"
 }
 
-// 笔记本分类
-// cates = [{title:"xxx", cateId: "xxxx"}, {}]
-func (c Blog) getCateUrlTitle(n *info.Notebook) string {
-	if n.UrlTitle != "" {
-		return n.UrlTitle
-	}
-	return n.NotebookId.Hex()
-}
+// 笔记本分类 只列出两级 Notebook
 func (c Blog) getCates(userBlog info.UserBlog) {
-	notebooks := blogService.ListBlogNotebooks(userBlog.UserId.Hex())
-	notebooksMap := map[string]info.Notebook{}
-	for _, each := range notebooks {
-		notebooksMap[each.NotebookId.Hex()] = each
-	}
+	cates := []map[string]interface{}{}
+	// childCates := []map[string]string{}
+	userId := userBlog.UserId.Hex()
 
-	var i = 0
-	cates := make([]*info.Cate, len(notebooks))
+	notebooks := notebookService.GetNotebooksRaw(userId, "Title")
+	if len(notebooks) == 0 {return}
 
-	// 先要保证已有的是正确的排序
-	cateIds := userBlog.CateIds
-	has := map[string]bool{} // cateIds中有的
-	cateMap := map[string]*info.Cate{}
-	if cateIds != nil && len(cateIds) > 0 {
-		for _, cateId := range cateIds {
-			if n, ok := notebooksMap[cateId]; ok {
-				parentNotebookId := ""
-				if n.ParentNotebookId != "" {
-					parentNotebookId = n.ParentNotebookId.Hex()
+	for _, notebook := range notebooks {
+		notebookId := notebook.NotebookId.Hex()
+		if count := notebookService.HasBlog(notebookId); count > 0 { // 如果 notebook 下有 blog
+
+			parentId := notebook.ParentNotebookId.Hex()
+			if len(parentId) == 0 { // 如果是顶层 notebook
+
+				childIds := notebook.ChildNotebookIds
+				childCates := []map[string]interface{}{}
+				if len(childIds) > 0 { // 如果有子分类
+					for _, childId := range childIds {
+						if childCount := notebookService.HasBlog(childId.Hex()); childCount > 0 { // 如果 childnotebook 也有 blog
+							childNotebook := notebookService.GetNotebook(childId.Hex(), userId)
+							cate := map[string]interface{}{"Title": childNotebook.Title, "UrlTitle": childNotebook.UrlTitle,
+								"CateId": childId.Hex(), "CateCount": childCount}
+							childCates = append(childCates, cate)
+						}
+					}
+					// childCates 按 Title 升序排序
+					sort.Slice(childCates, func(i,j int)bool{return childCates[i]["Title"].(string) < childCates[j]["Title"].(string)})
 				}
-				cates[i] = &info.Cate{Title: n.Title, UrlTitle: c.getCateUrlTitle(&n), CateId: n.NotebookId.Hex(), ParentCateId: parentNotebookId}
-				cateMap[cates[i].CateId] = cates[i]
-				i++
-				has[cateId] = true
+
+				cate := map[string]interface{}{"Title": notebook.Title, "UrlTitle": notebook.UrlTitle, "CateId": notebookId,
+					"SubCates": childCates, "SubCateCount": len(childCates), "CateCount": count}
+				cates = append(cates, cate)
 			}
-		}
-	}
-
-	// 之后添加没有排序的
-	for _, n := range notebooks {
-		id := n.NotebookId.Hex()
-		if !has[id] {
-			parentNotebookId := ""
-			if n.ParentNotebookId != "" {
-				parentNotebookId = n.ParentNotebookId.Hex()
-			}
-			cates[i] = &info.Cate{Title: n.Title, UrlTitle: c.getCateUrlTitle(&n), CateId: id, ParentCateId: parentNotebookId}
-			cateMap[cates[i].CateId] = cates[i]
-			i++
-		}
-	}
-
-	//	LogJ(">>")
-	//	LogJ(cates)
-
-	// 建立层级
-	hasParent := map[string]bool{} // 有父的cate
-	for _, cate := range cates {
-		parentCateId := cate.ParentCateId
-		if parentCateId != "" {
-			if parentCate, ok := cateMap[parentCateId]; ok {
-				//				Log("________")
-				//				LogJ(parentCate)
-				//				LogJ(cate)
-				if parentCate.Children == nil {
-					parentCate.Children = []*info.Cate{cate}
-				} else {
-					parentCate.Children = append(parentCate.Children, cate)
-				}
-				hasParent[cate.CateId] = true
-			}
-		}
-	}
-
-	// 得到没有父的cate, 作为第一级cate
-	catesTree := []*info.Cate{}
-	for _, cate := range cates {
-		if !hasParent[cate.CateId] {
-			catesTree = append(catesTree, cate)
 		}
 	}
 
 	c.ViewArgs["cates"] = cates
-	c.ViewArgs["catesTree"] = catesTree
 }
+// cates = [{title:"xxx", cateId: "xxxx"}, {}]
+// func (c Blog) getCateUrlTitle(n *info.Notebook) string {
+// 	if n.UrlTitle != "" {
+// 		return n.UrlTitle
+// 	}
+// 	return n.NotebookId.Hex()
+// }
+// func (c Blog) getCates(userBlog info.UserBlog) {
+// 	notebooks := blogService.ListBlogNotebooks(userBlog.UserId.Hex())
+// 	notebooksMap := map[string]info.Notebook{}
+// 	for _, each := range notebooks {
+// 		notebooksMap[each.NotebookId.Hex()] = each
+// 	}
+
+// 	var i = 0
+// 	cates := make([]*info.Cate, len(notebooks))
+
+// 	// 先要保证已有的是正确的排序
+// 	cateIds := userBlog.CateIds
+// 	has := map[string]bool{} // cateIds中有的
+// 	cateMap := map[string]*info.Cate{}
+// 	if cateIds != nil && len(cateIds) > 0 {
+// 		for _, cateId := range cateIds {
+// 			if n, ok := notebooksMap[cateId]; ok {
+// 				parentNotebookId := ""
+// 				if n.ParentNotebookId != "" {
+// 					parentNotebookId = n.ParentNotebookId.Hex()
+// 				}
+// 				cates[i] = &info.Cate{Title: n.Title, UrlTitle: c.getCateUrlTitle(&n), CateId: n.NotebookId.Hex(), ParentCateId: parentNotebookId}
+// 				cateMap[cates[i].CateId] = cates[i]
+// 				i++
+// 				has[cateId] = true
+// 			}
+// 		}
+// 	}
+
+// 	// 之后添加没有排序的
+// 	for _, n := range notebooks {
+// 		id := n.NotebookId.Hex()
+// 		if !has[id] {
+// 			parentNotebookId := ""
+// 			if n.ParentNotebookId != "" {
+// 				parentNotebookId = n.ParentNotebookId.Hex()
+// 			}
+// 			cates[i] = &info.Cate{Title: n.Title, UrlTitle: c.getCateUrlTitle(&n), CateId: id, ParentCateId: parentNotebookId}
+// 			cateMap[cates[i].CateId] = cates[i]
+// 			i++
+// 		}
+// 	}
+
+// 	//	LogJ(">>")
+// 	//	LogJ(cates)
+
+// 	// 建立层级
+// 	hasParent := map[string]bool{} // 有父的cate
+// 	for _, cate := range cates {
+// 		parentCateId := cate.ParentCateId
+// 		if parentCateId != "" {
+// 			if parentCate, ok := cateMap[parentCateId]; ok {
+// 				//				Log("________")
+// 				//				LogJ(parentCate)
+// 				//				LogJ(cate)
+// 				if parentCate.Children == nil {
+// 					parentCate.Children = []*info.Cate{cate}
+// 				} else {
+// 					parentCate.Children = append(parentCate.Children, cate)
+// 				}
+// 				hasParent[cate.CateId] = true
+// 			}
+// 		}
+// 	}
+
+// 	// 得到没有父的cate, 作为第一级cate
+// 	catesTree := []*info.Cate{}
+// 	for _, cate := range cates {
+// 		if !hasParent[cate.CateId] {
+// 			catesTree = append(catesTree, cate)
+// 		}
+// 	}
+
+// 	c.ViewArgs["cates"] = cates
+// 	c.ViewArgs["catesTree"] = catesTree
+// }
 
 // 单页
 func (c Blog) getSingles(userId string) {
@@ -334,7 +381,7 @@ func (c Blog) blogCommon(userId string, userBlog info.UserBlog, userInfo info.Us
 	//	c.ViewArgs["userBlog"] = userBlog
 
 	// 分类导航
-	c.getCates(userBlog)
+	// c.getCates(userBlog)
 
 	// 单页导航
 	c.getSingles(userId)
@@ -342,8 +389,8 @@ func (c Blog) blogCommon(userId string, userBlog info.UserBlog, userInfo info.Us
 	c.setUrl(userBlog, userInfo)
 
 	// 当前分类Id, 全设为""
-	c.ViewArgs["curCateId"] = ""
-	c.ViewArgs["curSingleId"] = ""
+	// c.ViewArgs["curCateId"] = ""
+	// c.ViewArgs["curSingleId"] = ""
 
 	// 得到主题信息
 	themeInfo := themeService.GetThemeInfo(userBlog.ThemeId.Hex(), userBlog.Style)
@@ -410,7 +457,7 @@ func (c Blog) Tags(userIdOrEmail string) (re revel.Result) {
 	return c.render("tags.html", userBlog.ThemePath)
 }
 
-// 标签的文章页
+// 标签的文章页 取消页数
 func (c Blog) Tag(userIdOrEmail, tag string) (re revel.Result) {
 	// 自定义域名
 	hasDomain, userBlog := c.domain()
@@ -445,13 +492,14 @@ func (c Blog) Tag(userIdOrEmail, tag string) (re revel.Result) {
 
 	c.ViewArgs["curIsTagPosts"] = true
 	c.ViewArgs["curTag"] = tag
-	page := c.GetPage()
-	pageInfo, blogs := blogService.SearchBlogByTags([]string{tag}, userId, page, userBlog.PerPageSize, userBlog.SortField, userBlog.IsAsc)
-	c.setPaging(pageInfo)
+	// page := c.GetPage()
+	blogs := blogService.SearchBlogByTags([]string{tag}, userId, userBlog.SortField, userBlog.IsAsc)
+	// c.setPaging(pageInfo)
 
+	c.ViewArgs["curTagCount"] = len(blogs)
 	c.ViewArgs["posts"] = blogService.FixBlogs(blogs)
-	tagPostsUrl := c.ViewArgs["tagPostsUrl"].(string)
-	c.ViewArgs["pagingBaseUrl"] = tagPostsUrl + "/" + tag
+	// tagPostsUrl := c.ViewArgs["tagPostsUrl"].(string)
+	// c.ViewArgs["pagingBaseUrl"] = tagPostsUrl + "/" + tag
 
 	return c.render("tag_posts.html", userBlog.ThemePath)
 }
@@ -489,7 +537,7 @@ func (c Blog) Archives(userIdOrEmail string, cateId string, year, month int) (re
 		return c.e404(userBlog.ThemePath) // 404 TODO 使用用户的404
 	}
 
-	arcs := blogService.ListBlogsArchive(userId, notebookId, year, month, "PublicTime", false)
+	arcs := blogService.ListBlogsArchive(userId, notebookId, year, month, userBlog.SortField, false)
 	c.ViewArgs["archives"] = arcs
 
 	c.ViewArgs["curIsArchive"] = true
@@ -507,6 +555,28 @@ func (c Blog) Archives(userIdOrEmail string, cateId string, year, month int) (re
 // 进入某个用户的博客
 var blogPageSize = 5
 var searchBlogPageSize = 30
+
+// 分类
+func (c Blog) Cates(userIdOrEmail string) (re revel.Result) {
+	hasDomain, userBlog := c.domain() // 自定义域名
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+			re = c.e404(userBlog.ThemePath)
+		}
+	}()
+
+	userId, userInfo := c.userIdOrEmail(hasDomain, userBlog, userIdOrEmail)
+	var ok = false
+	if ok, userBlog = c.blogCommon(userId, userBlog, userInfo); !ok {
+		return c.e404(userBlog.ThemePath) // 404 TODO 使用用户的404
+	}
+	
+	c.getCates(userBlog)
+	c.ViewArgs["curIsCates"] = true
+
+	return c.render("cates.html", userBlog.ThemePath)
+}
 
 // 分类 /cate/xxxxxxxx?notebookId=1212
 func (c Blog) Cate(userIdOrEmail string, notebookId string) (re revel.Result) {
@@ -531,26 +601,23 @@ func (c Blog) Cate(userIdOrEmail string, notebookId string) (re revel.Result) {
 	}
 	var ok = false
 	if ok, userBlog = c.blogCommon(userId, userBlog, userInfo); !ok {
+		fmt.Println("Blog.Cate execute blogCommon failed")
 		return c.e404(userBlog.ThemePath) // 404 TODO 使用用户的404
 	}
-	if !notebook.IsBlog {
-		panic("")
+
+	blogs := blogService.SearchBlogByCate(notebookId2, userId, userBlog.SortField, userBlog.IsAsc)
+	if len(blogs) <= 0 {
+		panic("curCate has not blog")
 	}
 
-	// 分页的话, 需要分页信息, totalPage, curPage
-	page := c.GetPage()
-	pageInfo, blogs := blogService.ListBlogs(userId, notebookId2, page, userBlog.PerPageSize, userBlog.SortField, userBlog.IsAsc)
-	blogs2 := blogService.FixBlogs(blogs)
-	c.ViewArgs["posts"] = blogs2
-
-	c.setPaging(pageInfo)
-
+	c.ViewArgs["posts"] = blogService.FixBlogs(blogs)
 	c.ViewArgs["curCateTitle"] = notebook.Title
 	c.ViewArgs["curCateId"] = notebookId2
-	cateUrl := c.ViewArgs["cateUrl"].(string)
-	c.ViewArgs["pagingBaseUrl"] = cateUrl + "/" + notebookId
+	c.ViewArgs["curCateCount"] = len(blogs)
 	c.ViewArgs["curIsCate"] = true
-
+	// cateUrl := c.ViewArgs["cateUrl"].(string) //暂时取消分页
+	// c.ViewArgs["pagingBaseUrl"] = cateUrl + "/" + notebookId
+	
 	return c.render("cate.html", userBlog.ThemePath)
 }
 

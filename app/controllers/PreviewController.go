@@ -73,6 +73,12 @@ func (c Preview) Archives(userIdOrEmail string, notebookId string, year, month i
 	return c.Blog.Archives(c.GetUserId(), notebookId, year, month)
 	//	return blog.RenderTemplate("archive.html", c.ViewArgs, c.getPreviewThemeAbsolutePath(""))
 }
+func (c Preview) Cates(userIdOrEmail string) revel.Result {
+	if !c.getPreviewThemeAbsolutePath("") {
+		return c.E404()
+	}
+	return c.Blog.Cates(c.GetUserId())
+}
 func (c Preview) Cate(userIdOrEmail, notebookId string) revel.Result {
 	if !c.getPreviewThemeAbsolutePath("") {
 		return c.E404()

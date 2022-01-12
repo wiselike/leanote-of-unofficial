@@ -129,7 +129,7 @@ func (c BaseController) Json(i interface{}) string {
 	return string(b)
 }
 
-// 得到第几页
+// 得到第几页 得到url参数中的page
 func (c BaseController) GetPage() int {
 	page := 0
 	c.Params.Bind(&page, "page")

@@ -1,14 +1,15 @@
 package service
 
 import (
-	//	"fmt"
+	// "fmt"
+	"sort"
+	"strings"
+	"time"
+
 	"github.com/leanote/leanote/app/db"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
-	"sort"
-	"strings"
-	"time"
 	//	"html"
 )
 
@@ -94,6 +95,26 @@ func ParseAndSortNotebooks(userNotebooks []info.Notebook, noParentDelete, needSo
 	return final
 }
 
+// 得到 notebook 的分类及父分类 ["Life": {}, "Life1": {}, "Life11": {}] 层级关系：Life -> Life.1 -> Life.1.1
+func (this *NotebookService) GetNotebookIdsAndTitles (notebookId, userId string) (cates []map[string]string) {
+	i := 0
+	for i < 10 { // 最多10层分类
+		notebook := notebookService.GetNotebook(notebookId, userId)
+		cates = append(cates, map[string]string{"Title": notebook.Title, "UrlTitle": notebook.UrlTitle, "NotebookId": notebookId})
+		notebookId = notebook.ParentNotebookId.Hex()
+		if len(notebookId) > 0 {
+			i = i + 1
+			continue
+		} else {
+			break
+		}
+	}
+	for i, j := 0, len(cates)-1; i < j; i, j = i+1, j-1 { // 反转 cates
+		cates[i], cates[j] = cates[j], cates[i]
+	}
+	return
+}
+
 // 得到某notebook
 func (this *NotebookService) GetNotebook(notebookId, userId string) info.Notebook {
 	notebook := info.Notebook{}
@@ -123,6 +144,24 @@ func (this *NotebookService) GeSyncNotebooks(userId string, afterUsn, maxEntry i
 	return notebooks
 }
 
+// 得到用户下所有的notebook 不排序 原始版本
+func (this *NotebookService) GetNotebooksRaw(userId, sortField string) []info.Notebook {
+	userNotebooks := []info.Notebook{}
+	orQ := []bson.M{
+		bson.M{"IsDeleted": false},
+		bson.M{"IsDeleted": bson.M{"$exists": false}},
+	}
+	q := db.Notebooks.Find(bson.M{"UserId": bson.ObjectIdHex(userId), "$or": orQ})
+	if sortField != "" {q = q.Sort(sortField)}
+	q.All(&userNotebooks)
+
+	if len(userNotebooks) == 0 {
+		return nil
+	}
+	
+	return userNotebooks
+}
+
 // 得到用户下所有的notebook
 // 排序好之后返回
 // [ok]
@@ -137,7 +176,7 @@ func (this *NotebookService) GetNotebooks(userId string) info.SubNotebooks {
 	if len(userNotebooks) == 0 {
 		return nil
 	}
-
+	
 	return ParseAndSortNotebooks(userNotebooks, true, true)
 }
 
@@ -155,6 +194,25 @@ func (this *NotebookService) GetNotebooksByNotebookIds(notebookIds []bson.Object
 	return ParseAndSortNotebooks(userNotebooks, false, false)
 }
 
+// 更新父的ChildNotebookIds
+func (this *NotebookService) UpdateNotebookChilds (notebookId, childNotebookId, userId, method string) (bool, info.Notebook) {
+	notebook := this.GetNotebook(notebookId, userId)
+	if method == "Add" {
+		notebook.ChildNotebookIds = append(notebook.ChildNotebookIds, bson.ObjectIdHex(childNotebookId))
+	} else if method == "Delete" {
+		var childs []bson.ObjectId
+		for _, child := range notebook.ChildNotebookIds {
+			if child != bson.ObjectIdHex(childNotebookId) {
+				childs = append(childs, child)
+			}
+		}
+		notebook.ChildNotebookIds = childs
+	}
+	db.UpdateByIdAndUserId(db.Notebooks, notebookId, userId,
+		bson.M{"$set": bson.M{"ChildNotebookIds": notebook.ChildNotebookIds}})
+	return true, notebook
+}
+
 // 添加
 func (this *NotebookService) AddNotebook(notebook info.Notebook) (bool, info.Notebook) {
 
@@ -162,8 +220,14 @@ func (this *NotebookService) AddNotebook(notebook info.Notebook) (bool, info.Not
 		notebook.NotebookId = bson.NewObjectId()
 	}
 
-	notebook.UrlTitle = GetUrTitle(notebook.UserId.Hex(), notebook.Title, "notebook", notebook.NotebookId.Hex())
-	notebook.Usn = userService.IncrUsn(notebook.UserId.Hex())
+	userId, parentNotebookId := notebook.UserId.Hex(), notebook.ParentNotebookId.Hex()
+	if len(parentNotebookId) > 0 { // 更新父的 ChildNotebookIds
+		this.UpdateNotebookChilds(parentNotebookId, notebook.NotebookId.Hex(), userId, "Add")
+	}
+	
+
+	notebook.UrlTitle = GetUrTitle(userId, notebook.Title, "notebook", notebook.NotebookId.Hex())
+	notebook.Usn = userService.IncrUsn(userId)
 	now := time.Now()
 	notebook.CreatedTime = now
 	notebook.UpdatedTime = now
@@ -211,6 +275,12 @@ func (this *NotebookService) IsBlog(notebookId string) bool {
 	return notebook.IsBlog
 }
 
+// 判断 Notebook 中是否含有 blog 并返回包含 blog 数量
+func (this *NotebookService) HasBlog(notebookId string) int {
+	return db.Count(db.Notes, bson.M{"IsBlog": true, "IsTrash": false, "IsDeleted": false,
+			"Cates.NotebookId": bson.M{"$in": []string{notebookId} } })
+}
+
 // 判断是否是我的notebook
 func (this *NotebookService) IsMyNotebook(notebookId, userId string) bool {
 	return db.Has(db.Notebooks, bson.M{"_id": bson.ObjectIdHex(notebookId), "UserId": bson.ObjectIdHex(userId)})
@@ -228,6 +298,7 @@ func (this *NotebookService) UpdateNotebook(notebook info.Notebook) bool {
 // [ok]
 func (this *NotebookService) UpdateNotebookTitle(notebookId, userId, title string) bool {
 	usn := userService.IncrUsn(userId)
+	db.UpdateByQField(db.Notes, bson.M{"IsDeleted": false, "IsTrash": false, "Cates.NotebookId": notebookId}, "Cates.$.Title", title) // 修改Notes.$.Cates.$.Title
 	return db.UpdateByIdAndUserIdMap(db.Notebooks, notebookId, userId, bson.M{"Title": title, "Usn": usn})
 }
 
@@ -280,17 +351,22 @@ func (this *NotebookService) ToBlog(userId, notebookId string, isBlog bool) bool
 // 查看是否有子notebook
 // 先查看该notebookId下是否有notes, 没有则删除
 func (this *NotebookService) DeleteNotebook(userId, notebookId string) (bool, string) {
+	notebookid := bson.ObjectIdHex(notebookId)
 	if db.Count(db.Notebooks, bson.M{
-		"ParentNotebookId": bson.ObjectIdHex(notebookId),
+		"ParentNotebookId": notebookid,
 		"UserId":           bson.ObjectIdHex(userId),
 		"IsDeleted":        false,
 	}) == 0 { // 无
-		if db.Count(db.Notes, bson.M{"NotebookId": bson.ObjectIdHex(notebookId),
+		if db.Count(db.Notes, bson.M{"NotebookId": notebookid,
 			"UserId":    bson.ObjectIdHex(userId),
 			"IsTrash":   false,
-			"IsDeleted": false}) == 0 { // 不包含trash
+			"IsDeleted": false}) == 0 { // 不包含trash	
+			notebook := this.GetNotebook(notebookId, userId)
+			if len(notebook.ParentNotebookId.Hex()) > 0 { // 更新父的 ChildNotebookIds
+				this.UpdateNotebookChilds(notebook.ParentNotebookId.Hex(), notebookId, userId, "Delete")
+			}
 			// 不是真删除 1/20, 为了同步笔记本
-			ok := db.UpdateByQMap(db.Notebooks, bson.M{"_id": bson.ObjectIdHex(notebookId)}, bson.M{"IsDeleted": true, "Usn": userService.IncrUsn(userId)})
+			ok := db.UpdateByQMap(db.Notebooks, bson.M{"_id": notebookid}, bson.M{"IsDeleted": true, "Usn": userService.IncrUsn(userId)})
 			return ok, ""
 			//			return db.DeleteByIdAndUserId(db.Notebooks, notebookId, userId), ""
 		}
@@ -302,12 +378,15 @@ func (this *NotebookService) DeleteNotebook(userId, notebookId string) (bool, st
 
 // API调用, 删除笔记本, 不作笔记控制
 func (this *NotebookService) DeleteNotebookForce(userId, notebookId string, usn int) (bool, string) {
-	notebook := this.GetNotebookById(notebookId)
+	notebook := this.GetNotebook(notebookId, userId)
 	// 不存在
 	if notebook.NotebookId == "" {
 		return false, "notExists"
 	} else if notebook.Usn != usn {
 		return false, "conflict"
+	}
+	if len(notebook.ParentNotebookId.Hex()) > 0 { // 更新父的 ChildNotebookIds
+		this.UpdateNotebookChilds(notebook.ParentNotebookId.Hex(), notebookId, userId, "Delete")
 	}
 	return db.DeleteByIdAndUserId(db.Notebooks, notebookId, userId), ""
 }
@@ -333,10 +412,17 @@ func (this *NotebookService) SortNotebooks(userId string, notebookId2Seqs map[st
 // 排序和设置父
 func (this *NotebookService) DragNotebooks(userId string, curNotebookId string, parentNotebookId string, siblings []string) bool {
 	ok := false
+
+	curNotebook := this.GetNotebook(curNotebookId, userId)
+	if len(curNotebook.ParentNotebookId.Hex()) > 0 { // 旧的父 减
+		this.UpdateNotebookChilds(curNotebook.ParentNotebookId.Hex(), curNotebookId, userId, "Delete")
+	}
+
 	// 如果没parentNotebookId, 则parentNotebookId设空
 	if parentNotebookId == "" {
 		ok = db.UpdateByIdAndUserIdMap(db.Notebooks, curNotebookId, userId, bson.M{"ParentNotebookId": "", "Usn": userService.IncrUsn(userId)})
 	} else {
+		this.UpdateNotebookChilds(parentNotebookId, curNotebookId, userId, "Add") // 新的父 加
 		ok = db.UpdateByIdAndUserIdMap(db.Notebooks, curNotebookId, userId, bson.M{"ParentNotebookId": bson.ObjectIdHex(parentNotebookId), "Usn": userService.IncrUsn(userId)})
 	}
 

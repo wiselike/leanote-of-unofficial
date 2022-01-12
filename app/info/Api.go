@@ -1,8 +1,9 @@
 package info
 
 import (
-	"gopkg.in/mgo.v2/bson"
 	"time"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 //---------
@@ -24,6 +25,7 @@ type ApiNote struct {
 	Desc       string
 	//	ImgSrc     string
 	Tags       []string
+	Cates      []map[string]string
 	Abstract   string
 	Content    string
 	IsMarkdown bool
@@ -74,6 +76,7 @@ type ApiNotebook struct {
 	NotebookId       bson.ObjectId `bson:"_id,omitempty"` // 必须要设置bson:"_id" 不然mgo不会认为是主键
 	UserId           bson.ObjectId `bson:"UserId"`
 	ParentNotebookId bson.ObjectId `bson:"ParentNotebookId,omitempty"` // 上级
+	ChildNotebookIds []bson.ObjectId `bson:"ChildNotebookIds"` // 下级
 	Seq              int           `Seq`                               // 排序
 	Title            string        `Title`                             // 标题
 	UrlTitle         string        `UrlTitle`                          // Url标题 2014/11.11加
