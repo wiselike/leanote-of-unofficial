@@ -207,9 +207,8 @@ func (c Blog) getCates(userBlog info.UserBlog) {
 
 			parentId := notebook.ParentNotebookId.Hex()
 			if len(parentId) == 0 { // 如果是顶层 notebook
-
 				childIds := notebook.ChildNotebookIds
-				childCates := []map[string]interface{}{}
+				childCates := make([]map[string]interface{}, 0, len(childIds))
 				if len(childIds) > 0 { // 如果有子分类
 					for _, childId := range childIds {
 						if childCount := notebookService.HasBlog(childId.Hex()); childCount > 0 { // 如果 childnotebook 也有 blog
@@ -561,7 +560,6 @@ func (c Blog) Cates(userIdOrEmail string) (re revel.Result) {
 	hasDomain, userBlog := c.domain() // 自定义域名
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println(err)
 			re = c.e404(userBlog.ThemePath)
 		}
 	}()
@@ -571,7 +569,7 @@ func (c Blog) Cates(userIdOrEmail string) (re revel.Result) {
 	if ok, userBlog = c.blogCommon(userId, userBlog, userInfo); !ok {
 		return c.e404(userBlog.ThemePath) // 404 TODO 使用用户的404
 	}
-	
+
 	c.getCates(userBlog)
 	c.ViewArgs["curIsCates"] = true
 
@@ -601,7 +599,6 @@ func (c Blog) Cate(userIdOrEmail string, notebookId string) (re revel.Result) {
 	}
 	var ok = false
 	if ok, userBlog = c.blogCommon(userId, userBlog, userInfo); !ok {
-		fmt.Println("Blog.Cate execute blogCommon failed")
 		return c.e404(userBlog.ThemePath) // 404 TODO 使用用户的404
 	}
 
@@ -617,7 +614,7 @@ func (c Blog) Cate(userIdOrEmail string, notebookId string) (re revel.Result) {
 	c.ViewArgs["curIsCate"] = true
 	// cateUrl := c.ViewArgs["cateUrl"].(string) //暂时取消分页
 	// c.ViewArgs["pagingBaseUrl"] = cateUrl + "/" + notebookId
-	
+
 	return c.render("cate.html", userBlog.ThemePath)
 }
 

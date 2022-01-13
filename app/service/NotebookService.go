@@ -200,7 +200,7 @@ func (this *NotebookService) UpdateNotebookChilds (notebookId, childNotebookId, 
 	if method == "Add" {
 		notebook.ChildNotebookIds = append(notebook.ChildNotebookIds, bson.ObjectIdHex(childNotebookId))
 	} else if method == "Delete" {
-		var childs []bson.ObjectId
+		childs := make([]bson.ObjectId, 0, len(notebook.ChildNotebookIds))
 		for _, child := range notebook.ChildNotebookIds {
 			if child != bson.ObjectIdHex(childNotebookId) {
 				childs = append(childs, child)
@@ -224,7 +224,6 @@ func (this *NotebookService) AddNotebook(notebook info.Notebook) (bool, info.Not
 	if len(parentNotebookId) > 0 { // 更新父的 ChildNotebookIds
 		this.UpdateNotebookChilds(parentNotebookId, notebook.NotebookId.Hex(), userId, "Add")
 	}
-	
 
 	notebook.UrlTitle = GetUrTitle(userId, notebook.Title, "notebook", notebook.NotebookId.Hex())
 	notebook.Usn = userService.IncrUsn(userId)
@@ -360,7 +359,7 @@ func (this *NotebookService) DeleteNotebook(userId, notebookId string) (bool, st
 		if db.Count(db.Notes, bson.M{"NotebookId": notebookid,
 			"UserId":    bson.ObjectIdHex(userId),
 			"IsTrash":   false,
-			"IsDeleted": false}) == 0 { // 不包含trash	
+			"IsDeleted": false}) == 0 { // 不包含trash
 			notebook := this.GetNotebook(notebookId, userId)
 			if len(notebook.ParentNotebookId.Hex()) > 0 { // 更新父的 ChildNotebookIds
 				this.UpdateNotebookChilds(notebook.ParentNotebookId.Hex(), notebookId, userId, "Delete")

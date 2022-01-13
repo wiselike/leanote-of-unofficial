@@ -158,7 +158,6 @@ func Unzip(srcFilePath string, destDirPath string) (ok bool, msg string) {
 		prePath := ""
 		filename := ""
 		l := len(paths)
-		//		fmt.Println(l)
 		if l > 1 {
 			// 去掉第1个文件夹
 			if l == 2 {
@@ -173,7 +172,6 @@ func Unzip(srcFilePath string, destDirPath string) (ok bool, msg string) {
 		if filename == "" {
 			continue
 		}
-		//		fmt.Println(prePath)
 
 		// 相对于目标文件件下的路径
 		destPath := destDirPath + "/" + filename
@@ -183,7 +181,6 @@ func Unzip(srcFilePath string, destDirPath string) (ok bool, msg string) {
 		}
 		// Write data to file
 		rc, err := f.Open()
-		defer rc.Close()
 		if err != nil {
 			fmt.Println("FileName : ", f.Name, " open error: ", err)
 			panic(err)
@@ -200,6 +197,8 @@ func Unzip(srcFilePath string, destDirPath string) (ok bool, msg string) {
 			fmt.Println("archive.zip Unzip io.Copy", err)
 			panic(err)
 		}
+		fw.Close()
+		rc.Close()
 	}
 
 	ok = true
