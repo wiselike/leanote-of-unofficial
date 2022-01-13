@@ -16,3 +16,4 @@
 + 3. patched https://github.com/ctaoist/leanote/commit/c5c19e32e0cb892fe35178a14dfe927049f5b3a9
 + 4. patched https://github.com/ctaoist/leanote/commit/c2c4a5536301132a78594c2311d1dbd0d957b304
 + 5. 自研的优化
++ 6. patched "markdown编辑器增加字数统计功能" https://github.com/ctaoist/leanote/commit/297ca0c3ef15db680a7fe395b0283497dd768b2d and https://github.com/ctaoist/leanote/commit/7060829c7ab015431d05a529c4f2d31822992f15
