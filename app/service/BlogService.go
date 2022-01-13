@@ -323,13 +323,12 @@ func (this *BlogService) SearchBlogByCate(notebookId, userId, sortField string, 
 		"IsDeleted": false,
 		"IsBlog":    true,
 		"Cates.NotebookId": bson.M{"$in": []string{notebookId}}}
-		
 	q := db.Notes.Find(query)
 
 	// 总记录数
 	count, _ := q.Count()
 	if count == 0 { return }
-	
+
 	q.Sort(sortFieldR).All(&notes)
 
 	blogs = this.notes2BlogItems(notes)
