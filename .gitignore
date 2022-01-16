@@ -26,3 +26,4 @@ target/
 package/leanote.tar.gz
 package/leanote/
 leanote.log
+Makefile
