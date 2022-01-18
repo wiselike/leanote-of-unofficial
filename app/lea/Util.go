@@ -43,12 +43,13 @@ func Digest2(str string) string {
 
 // Guid
 func NewGuid() string {
-	b := make([]byte, 48)
+	// b := make([]byte, 48)
 
-	if _, err := io.ReadFull(rand.Reader, b); err != nil {
-		return ""
-	}
-	return Md5(base64.URLEncoding.EncodeToString(b))
+	// if _, err := io.ReadFull(rand.Reader, b); err != nil {
+		// return ""
+	// }
+	// return Md5(base64.URLEncoding.EncodeToString(b))
+	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
 // 后面加个str生成之, 更有保障, 确保唯一
@@ -426,5 +427,6 @@ func GetRandomFilePath(userId, uuid string) string {
 	if uuid == "" {
 		uuid = NewGuid()
 	}
-	return Digest3(userId) + "/" + userId + "/" + Digest2(uuid)
+	//return Digest3(userId) + "/" + userId + "/" + Digest2(uuid)
+	return userId
 }

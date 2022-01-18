@@ -40,7 +40,7 @@ func (this *NoteImageService) UpdateNoteImages(userId, noteId, imgSrc, content s
 		content = "<img src=\"" + imgSrc + "\" >" + content
 	}
 	// life 添加getImage
-	reg, _ := regexp.Compile("(outputImage|getImage)\\?fileId=([a-z0-9A-Z]{24})")
+	reg, _ := regexp.Compile("(outputImage|getImage)\\?fileId=([a-z0-9A-Z]+)")
 	find := reg.FindAllStringSubmatch(content, -1) // 查找所有的
 
 	// 删除旧的
@@ -95,7 +95,7 @@ func (this *NoteImageService) CopyNoteImages(fromNoteId, fromUserId, newNoteId, 
 	// 把fileId=1232替换成新的
 	replaceMap := map[string]string{}
 
-	reg, _ := regexp.Compile("(outputImage|getImage)\\?fileId=([a-z0-9A-Z]{24})")
+	reg, _ := regexp.Compile("(outputImage|getImage)\\?fileId=([a-z0-9A-Z]+)")
 	content = reg.ReplaceAllStringFunc(content, func(each string) string {
 		// each = outputImage?fileId=541bd2f599c37b4f3r000003
 		// each = getImage?fileId=541bd2f599c37b4f3r000003
