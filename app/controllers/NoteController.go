@@ -353,7 +353,7 @@ func (c Note) ToPdf(noteId, appKey string) revel.Result {
 
 	siteUrlPattern = "(?:" + siteUrlPattern + ")*"
 
-	regImage, _ := regexp.Compile(`<img .*?(src=('|")` + siteUrlPattern + `/(file/outputImage|api/file/getImage)\?fileId=([a-z0-9A-Z]{24})("|'))`)
+	regImage, _ := regexp.Compile(`<img .*?(src=('|")` + siteUrlPattern + `/(file/outputImage|api/file/getImage)\?fileId=([a-z0-9A-Z]+)("|'))`)
 
 	findsImage := regImage.FindAllStringSubmatch(contentStr, -1) // 查找所有的
 	//	[<img src="http://leanote.com/api/getImage?fileId=3354672e8d38f411286b000069" alt="" width="692" height="302" data-mce-src="http://leanote.com/file/outputImage?fileId=54672e8d38f411286b000069" src="http://leanote.com/file/outputImage?fileId=54672e8d38f411286b000069" " file/outputImage 54672e8d38f411286b000069 "]
@@ -376,7 +376,7 @@ func (c Note) ToPdf(noteId, appKey string) revel.Result {
 	// markdown
 	if note.IsMarkdown {
 		// ![enter image description here](url)
-		regImageMarkdown, _ := regexp.Compile(`!\[.*?\]\(` + siteUrlPattern + `/(file/outputImage|api/file/getImage)\?fileId=([a-z0-9A-Z]{24})\)`)
+		regImageMarkdown, _ := regexp.Compile(`!\[.*?\]\(` + siteUrlPattern + `/(file/outputImage|api/file/getImage)\?fileId=([a-z0-9A-Z]+)\)`)
 		findsImageMarkdown := regImageMarkdown.FindAllStringSubmatch(contentStr, -1) // 查找所有的
 		for _, eachFind := range findsImageMarkdown {
 			if len(eachFind) == 3 {

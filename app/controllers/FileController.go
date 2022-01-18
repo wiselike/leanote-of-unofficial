@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/revel/revel"
-	//	"encoding/json"
 	"fmt"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
@@ -10,7 +9,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"os"
-	//	"strconv"
 	"strings"
 )
 
@@ -97,12 +95,6 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 		re.Ok = Ok
 	}()
 
-	// file, handel, err := c.Request.FormFile("file")
-	// if err != nil {
-	// 	return re
-	// }
-	// defer file.Close()
-
 	var data []byte
 	c.Params.Bind(&data, "file")
 	handel := c.Params.Files["file"][0]
@@ -119,7 +111,7 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 	// data, err := ioutil.ReadAll(file)
 	
 
-	// 生成上传路径
+	// 生成文件扩展名
 	newGuid := NewGuid()
 
 	userId := c.GetUserId()
@@ -127,7 +119,6 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 	if from == "logo" || from == "blogLogo" {
 		fileUrlPath = "public/upload/" + Digest3(userId) + "/" + userId + "/images/logo"
 	} else {
-		// fileUrlPath = "files/" + Digest3(userId) + "/" + userId + "/" + Digest2(newGuid) + "/images"
 		fileUrlPath = "files/" + GetRandomFilePath(userId, newGuid) + "/images"
 	}
 
@@ -152,11 +143,6 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 	}
 
 	filename = newGuid + ext
-	// data, err := ioutil.ReadAll(file)
-	// if err != nil {
-	// 	LogJ(err)
-	// 	return re
-	// }
 
 	var maxFileSize float64
 	if from == "logo" {
@@ -260,10 +246,9 @@ func (c File) CopyHttpImage(src string) revel.Result {
 	re := info.NewRe()
 
 	// 生成上传路径
-	newGuid := NewGuid()
+	// newGuid := NewGuid()
 	userId := c.GetUserId()
-	// fileUrlPath := "files/" + Digest3(userId) + "/" + userId + "/" + Digest2(newGuid) + "/images"
-	fileUrlPath := "files/" + GetRandomFilePath(userId, newGuid) + "/images"
+	fileUrlPath := "files/" + GetRandomFilePath(userId, "") + "/images"
 	dir := revel.BasePath + "/" + fileUrlPath
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
