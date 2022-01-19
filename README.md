@@ -19,3 +19,4 @@
 + 6. patched "markdown编辑器增加字数统计功能" https://github.com/ctaoist/leanote/commit/297ca0c3ef15db680a7fe395b0283497dd768b2d and https://github.com/ctaoist/leanote/commit/7060829c7ab015431d05a529c4f2d31822992f15
 + 7. 自研：修改配置文件，默认为中文的语言
 + 8. 自研：添加自定义的git忽略文件
++ 9. 自研：整理node图片，按标题来存放，以便于到服务器上检索维护
