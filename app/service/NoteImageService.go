@@ -1,16 +1,23 @@
 package service
 
 import (
+	"fmt"
 	"github.com/leanote/leanote/app/db"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/revel/revel"
+	"os"
+	"path"
+	"strings"
 	"regexp"
 	//	"time"
 )
 
 type NoteImageService struct {
 }
+
+var noteImageReg = regexp.MustCompile("(outputImage|getImage)\\?fileId=([a-z0-9A-Z]+)")
 
 // 通过id, userId得到noteIds
 func (this *NoteImageService) GetNoteIds(imageId string) []bson.ObjectId {
@@ -40,8 +47,7 @@ func (this *NoteImageService) UpdateNoteImages(userId, noteId, imgSrc, content s
 		content = "<img src=\"" + imgSrc + "\" >" + content
 	}
 	// life 添加getImage
-	reg, _ := regexp.Compile("(outputImage|getImage)\\?fileId=([a-z0-9A-Z]+)")
-	find := reg.FindAllStringSubmatch(content, -1) // 查找所有的
+	find := noteImageReg.FindAllStringSubmatch(content, -1) // 查找所有的
 
 	// 删除旧的
 	db.DeleteAll(db.NoteImages, bson.M{"NoteId": bson.ObjectIdHex(noteId)})
@@ -95,8 +101,7 @@ func (this *NoteImageService) CopyNoteImages(fromNoteId, fromUserId, newNoteId, 
 	// 把fileId=1232替换成新的
 	replaceMap := map[string]string{}
 
-	reg, _ := regexp.Compile("(outputImage|getImage)\\?fileId=([a-z0-9A-Z]+)")
-	content = reg.ReplaceAllStringFunc(content, func(each string) string {
+	content = noteImageReg.ReplaceAllStringFunc(content, func(each string) string {
 		// each = outputImage?fileId=541bd2f599c37b4f3r000003
 		// each = getImage?fileId=541bd2f599c37b4f3r000003
 
@@ -171,4 +176,75 @@ func (this *NoteImageService) getImagesByNoteIds(noteIds []bson.ObjectId) map[st
 		}
 	}
 	return noteImages
+}
+
+// 整理node图片，按标题来存放，以便于到服务器上检索维护
+func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) (rmDir string) {
+	// 获取所有的imgId
+	find := noteImageReg.FindAllStringSubmatch(content, -1) // 查找
+	if find==nil || len(find)<1 {
+		return
+	}
+
+	// 格式化titile
+	if title=="" {
+		title = "empty-titles-set"
+	} else {
+		title = FixFilename(title)
+	}
+	
+	newDbPathDir := path.Join("files", GetRandomFilePath(userId, ""), "/images/", title)
+	newPathDir := path.Join(revel.BasePath, newDbPathDir)
+	if err := os.MkdirAll(newPathDir, 0755); err!=nil {
+		return
+	}
+	for i, each := range find {
+		if each != nil && len(each) == 3 {
+			// 查找原路径
+			file := &info.File{}
+			if db.GetByIdAndUserId(db.Files, each[2], userId, file); file.Path!="" {
+				// 创建文件名，并移动路径
+				oldFullPath := path.Join(revel.BasePath, file.Path)
+				fname := strings.Split(path.Base(file.Path), "_")
+				file.Path = path.Join(newDbPathDir, fmt.Sprintf("%d_%s", i, fname[len(fname)-1]))
+				newFullPath := path.Join(revel.BasePath, file.Path)
+				if err := os.Rename(oldFullPath, newFullPath); err==nil {
+					// 更新数据库
+					if ok := db.UpdateByIdAndUserId(db.Files, each[2], userId, file); !ok {
+						// 数据库写失败，回滚
+						os.Rename(newFullPath, oldFullPath)
+						continue
+					}
+					// 保存第一张图片的文件夹，作为旧路径，用于删除
+					if rmDir=="" {
+						rmDir = path.Dir(oldFullPath)
+					}
+				}
+			}
+		}
+	}
+	
+	// 没有移动任何图片的话，则仅删除空文件夹
+	if rmDir=="" {
+		os.Remove(newPathDir)
+		return
+	}
+	if strings.HasPrefix(newPathDir, rmDir) {
+		return ""	// 避免把自己给删了
+	}
+	return
+}
+
+// 整理node图片，同上。带删除旧文件夹
+func (this *NoteImageService) ReOrganizeImageFiles(userId, noteId, newTitle string, hasContent bool, content string) bool {
+	if !hasContent {
+		// 获取content
+		content = noteService.GetNoteContent(noteId, userId).Content
+	}
+	
+	if oldDir := this.OrganizeImageFiles(userId, newTitle, content); oldDir!="" {
+		// 删旧文件夹
+		os.RemoveAll(oldDir)
+	}
+	return true	
 }
