@@ -69,8 +69,8 @@ func (this *ConfigService) InitGlobalConfigs() bool {
 	}
 
 	// site URL
-	if s, ok := this.GlobalStringConfigs["siteUrl"]; !ok || s != "" {
-		this.GlobalStringConfigs["siteUrl"] = this.siteUrl
+	if s, ok := this.GlobalStringConfigs["siteUrl"]; !ok || s != this.siteUrl {
+		this.UpdateGlobalStringConfig(this.adminUserId, "siteUrl", this.siteUrl)
 	}
 
 	return true
