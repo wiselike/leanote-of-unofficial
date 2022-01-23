@@ -12,6 +12,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"time"
 )
@@ -72,8 +73,8 @@ func (c Attach) uploadAttach(noteId string) (re info.Re) {
 	// 生成上传路径
 	//	filePath := "files/" + c.GetUserId() + "/attachs"
 	newGuid := NewGuid()
-	filePath := "files/" + GetRandomFilePath(c.GetUserId(), newGuid) + "/attachs"
-	dir := revel.BasePath + "/" + filePath
+	filePath := GetRandomFilePath(c.GetUserId(), newGuid) + "/attachs"
+	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), filePath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return re
@@ -139,14 +140,13 @@ func (c Attach) GetAttachs(noteId string) revel.Result {
 // 权限判断
 func (c Attach) Download(attachId string) revel.Result {
 	attach := attachService.GetAttach(attachId, c.GetUserId()) // 得到路径
-	path := attach.Path
-	if path == "" {
+	fpath := attach.Path
+	if fpath == "" {
 		return c.RenderText("")
 	}
-	fn := revel.BasePath + "/" + strings.TrimLeft(path, "/")
+	fn := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fpath)
 	file, _ := os.Open(fn)
 	return c.RenderBinary(file, attach.Title, revel.Attachment, time.Now()) // revel.Attachment
-	// return c.RenderFile(file, revel.Attachment) // revel.Attachment
 }
 
 func (c Attach) DownloadAll(noteId string) revel.Result {
@@ -161,7 +161,7 @@ func (c Attach) DownloadAll(noteId string) revel.Result {
 	}
 
 	/*
-		dir := revel.BasePath + "/files/tmp"
+		dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), "/tmp")
 		err := os.MkdirAll(dir, 0755)
 		if err != nil {
 			return c.RenderText("")
@@ -173,8 +173,8 @@ func (c Attach) DownloadAll(noteId string) revel.Result {
 		filename = "all.tar.gz"
 	}
 
-	dir := revel.BasePath + "/files/attach_all"
-
+	basePath := revel.Config.StringDefault("files.dir", revel.BasePath)
+	dir := path.Join(basePath, "attach_all")
 	if !MkdirAll(dir) {
 		return c.RenderText("error")
 	}
@@ -196,13 +196,12 @@ func (c Attach) DownloadAll(noteId string) revel.Result {
 
 	// 遍历文件列表
 	for _, attach := range attachs {
-		fn := revel.BasePath + "/" + strings.TrimLeft(attach.Path, "/")
+		fn := path.Join(basePath, attach.Path)
 		fr, err := os.Open(fn)
 		fileInfo, _ := fr.Stat()
 		if err != nil {
 			return c.RenderText("")
 		}
-		defer fr.Close()
 
 		// 信息头
 		h := new(tar.Header)
@@ -222,12 +221,10 @@ func (c Attach) DownloadAll(noteId string) revel.Result {
 		if err != nil {
 			panic(err)
 		}
+
+		fr.Close()
 	} // for
 
-	//    tw.Close()
-	//    gw.Close()
-	//    fw.Close()
-	//    file, _ := os.Open(dir + "/" + filename)
 	// fw.Seek(0, 0)
 	return c.RenderBinary(fw, filename, revel.Attachment, time.Now()) // revel.Attachment
 }

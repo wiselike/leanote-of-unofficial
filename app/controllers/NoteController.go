@@ -8,6 +8,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"os"
 	"os/exec"
+	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -434,8 +435,8 @@ func (c Note) ExportPdf(noteId string) revel.Result {
 
 	// path 判断是否需要重新生成之
 	guid := NewGuid()
-	fileUrlPath := "files/export_pdf"
-	dir := revel.BasePath + "/" + fileUrlPath
+	fileUrlPath := "export_pdf"
+	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fileUrlPath)
 	if !MkdirAll(dir) {
 		return c.RenderText("error, no dir")
 	}

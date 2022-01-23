@@ -9,7 +9,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"os"
-	"strings"
+	"path"
 )
 
 // 首页
@@ -82,8 +82,8 @@ func (c File) UploadImageLeaui(albumId string) revel.Result {
 // 上传图片, 公用方法
 // upload image common func
 func (c File) uploadImage(from, albumId string) (re info.Re) {
-	var fileUrlPath = ""
-	var fileId = ""
+	var fileUrlPath, dir string
+	var fileId string
 	var resultCode = 0      // 1表示正常
 	var resultMsg = "error" // 错误信息
 	var Ok = false
@@ -118,11 +118,12 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 
 	if from == "logo" || from == "blogLogo" {
 		fileUrlPath = "public/upload/" + Digest3(userId) + "/" + userId + "/images/logo"
+		dir = path.Join(revel.BasePath, fileUrlPath)
 	} else {
-		fileUrlPath = "files/" + GetRandomFilePath(userId, newGuid) + "/images"
+		fileUrlPath = GetRandomFilePath(userId, newGuid) + "/images"
+		dir = path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fileUrlPath)
 	}
 
-	dir := revel.BasePath + "/" + fileUrlPath
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return re
@@ -163,7 +164,7 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 		return re
 	}
 
-	toPath := dir + "/" + filename
+	toPath := path.Join(dir, filename)
 	err = ioutil.WriteFile(toPath, data, 0777)
 	if err != nil {
 		LogJ(err)
@@ -223,11 +224,11 @@ func (c File) DeleteImage(fileId string) revel.Result {
 // 输出image
 // 权限判断
 func (c File) OutputImage(noteId, fileId string) revel.Result {
-	path := fileService.GetFile(c.GetUserId(), fileId) // 得到路径
-	if path == "" {
+	fpath := fileService.GetFile(c.GetUserId(), fileId) // 得到路径
+	if fpath == "" {
 		return c.RenderText("")
 	}
-	fn := revel.BasePath + "/" + strings.TrimLeft(path, "/")
+	fn := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fpath)
 	file, _ := os.Open(fn)
 	return c.RenderFile(file, revel.Inline) // revel.Attachment
 }
@@ -248,8 +249,8 @@ func (c File) CopyHttpImage(src string) revel.Result {
 	// 生成上传路径
 	// newGuid := NewGuid()
 	userId := c.GetUserId()
-	fileUrlPath := "files/" + GetRandomFilePath(userId, "") + "/images"
-	dir := revel.BasePath + "/" + fileUrlPath
+	fileUrlPath := GetRandomFilePath(userId, "") + "/images"
+	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fileUrlPath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return c.RenderJSON(re)
