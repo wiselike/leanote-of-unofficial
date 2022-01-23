@@ -38,7 +38,7 @@ func (this SubNotebooks) Len() int {
 	return len(this)
 }
 func (this SubNotebooks) Less(i, j int) bool {
-	return (*this[i]).Seq < (*this[j]).Seq
+	return this[i].Seq < this[j].Seq
 }
 func (this SubNotebooks) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]

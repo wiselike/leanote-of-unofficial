@@ -206,7 +206,12 @@ func UpdateByIdAndUserId(collection *mgo.Collection, id, userId string, i interf
 	err := collection.Update(GetIdAndUserIdQ(id, userId), i)
 	return Err(err)
 }
-
+func UpdateByIdAndUserIdPush(collection *mgo.Collection, id, userId, field string, value interface{}) bool {
+	return UpdateByIdAndUserId(collection, id, userId, bson.M{"$push": bson.M{field: value}})
+}
+func UpdateByIdAndUserIdPop(collection *mgo.Collection, id, userId, field string) bool {
+	return UpdateByIdAndUserId(collection, id, userId, bson.M{"$pop": bson.M{field: -1}}) // 第一个
+}
 func UpdateByIdAndUserId2(collection *mgo.Collection, id, userId bson.ObjectId, i interface{}) bool {
 	err := collection.Update(GetIdAndUserIdBsonQ(id, userId), i)
 	return Err(err)
@@ -223,6 +228,15 @@ func UpdateByIdAndUserIdField2(collection *mgo.Collection, id, userId bson.Objec
 }
 func UpdateByIdAndUserIdMap2(collection *mgo.Collection, id, userId bson.ObjectId, v bson.M) bool {
 	return UpdateByIdAndUserId2(collection, id, userId, bson.M{"$set": v})
+}
+
+func GetNoteHistoriesCount(collection *mgo.Collection, noteId, userId string) int {
+	res := bson.M{}
+	collection.Pipe([]bson.M{{"$match":GetIdAndUserIdQ(noteId, userId)},{"$project":bson.M{"count":bson.M{"$size":"$Histories"}}}}).One(&res)
+	if count, ok := res["count"]; ok {
+		return count.(int)
+	}
+	return -1
 }
 
 //
