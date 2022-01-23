@@ -230,20 +230,25 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 		os.Remove(newPathDir)
 		return
 	}
-	if strings.HasPrefix(newPathDir, rmDir) {
+	if strings.HasPrefix(newPathDir, rmDir+"/") {    // 带文件夹结束符，避免比较到部分文件名
 		return ""	// 避免把自己给删了
 	}
 	return
 }
 
 // 整理node图片，同上。带删除旧文件夹
-func (this *NoteImageService) ReOrganizeImageFiles(userId, noteId, newTitle string, hasContent bool, content string) bool {
-	if !hasContent {
-		// 获取content
+func (this *NoteImageService) ReOrganizeImageFiles(userId, noteId, title, content string, hasTitle, hasContent bool) bool {
+	if !hasTitle && !hasContent {
+		return true
+	}
+	if !hasTitle {   // 获取title
+		title = noteService.GetNote(noteId, userId).Title
+	}
+	if !hasContent {   // 获取content
 		content = noteService.GetNoteContent(noteId, userId).Content
 	}
-	
-	if oldDir := this.OrganizeImageFiles(userId, newTitle, content); oldDir!="" {
+
+	if oldDir := this.OrganizeImageFiles(userId, title, content); oldDir!="" {
 		// 删旧文件夹
 		os.RemoveAll(oldDir)
 	}
