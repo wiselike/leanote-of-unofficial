@@ -223,8 +223,6 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 	if c.Has("Title") {
 		needUpdateNote = true
 		noteUpdate["Title"] = noteOrContent.Title
-		
-		noteImageService.ReOrganizeImageFiles(c.GetUserId(), noteOrContent.NoteId, noteOrContent.Title, c.Has("Content"), noteOrContent.Content)
 	}
 
 	if c.Has("Tags") {
@@ -249,6 +247,10 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 		noteService.UpdateNoteContent(c.GetUserId(),
 			noteOrContent.NoteId, noteOrContent.Content, noteOrContent.Abstract,
 			needUpdateNote, -1, time.Now())
+	}
+
+	if c.Has("Title") || c.Has("Content") {
+		noteImageService.ReOrganizeImageFiles(c.GetUserId(), noteOrContent.NoteId, noteOrContent.Title, noteOrContent.Content, c.Has("Title"), c.Has("Content"))
 	}
 
 	// Log("usn", "afterContentUsn", afterContentUsn + "")
