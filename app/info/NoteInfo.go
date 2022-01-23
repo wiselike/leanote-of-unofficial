@@ -74,15 +74,26 @@ type NoteAndContent struct {
 
 // 历史记录
 // 每一个历史记录对象
+type NoteContentHistory struct {
+	NoteId    bson.ObjectId `bson:"_id,omitempty"`
+	UserId    bson.ObjectId `bson:"UserId"` // 所属者
+	Histories []EachHistory `Histories`
+}
 type EachHistory struct {
 	UpdatedUserId bson.ObjectId `UpdatedUserId`
 	UpdatedTime   time.Time     `UpdatedTime`
 	Content       string        `Content`
 }
-type NoteContentHistory struct {
-	NoteId    bson.ObjectId `bson:"_id,omitempty"`
-	UserId    bson.ObjectId `bson:"UserId"` // 所属者
-	Histories []EachHistory `Histories`
+type EachHistorySlice []EachHistory
+// EachHistory sort
+func (this EachHistorySlice) Len() int {
+	return len(this)
+}
+func (this EachHistorySlice) Less(i, j int) bool {
+	return this[i].UpdatedTime.After(this[j].UpdatedTime)
+}
+func (this EachHistorySlice) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
 }
 
 // 为了NoteController接收参数
