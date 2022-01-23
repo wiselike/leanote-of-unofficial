@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"time"
 )
@@ -96,13 +97,12 @@ func (this *FileService) DeleteImage(userId, fileId string) (bool, string) {
 		if db.DeleteByIdAndUserId(db.Files, fileId, userId) {
 			// delete image
 			// TODO
-			file.Path = strings.TrimLeft(file.Path, "/")
 			var err error
-			if strings.HasPrefix(file.Path, "upload") {
+			if strings.HasPrefix(file.Path, "/upload/") {
 				Log(file.Path)
-				err = os.Remove(revel.BasePath + "/public/" + file.Path)
+				err = os.Remove(path.Join(revel.BasePath, "/public/", file.Path))
 			} else {
-				err = os.Remove(revel.BasePath + "/" + file.Path)
+				err = os.Remove(path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), file.Path))
 			}
 			if err == nil {
 				return true, ""
@@ -126,15 +126,13 @@ func (this *FileService) GetFileBase64(userId, fileId string) (str string, mine 
 		}
 	}()
 
-	path := this.GetFile(userId, fileId)
-
-	if path == "" {
+	fpath := this.GetFile(userId, fileId)
+	if fpath == "" {
 		return "", ""
 	}
+	fpath = path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fpath)
 
-	path = revel.BasePath + "/" + strings.TrimLeft(path, "/")
-
-	ff, err := ioutil.ReadFile(path)
+	ff, err := ioutil.ReadFile(fpath)
 	if err != nil {
 		return "", ""
 	}
@@ -264,16 +262,17 @@ func (this *FileService) CopyImage(userId, fileId, toUserId string) (bool, strin
 	guid := NewGuid()
 	newFilename := guid + ext
 
+	basePath := revel.Config.StringDefault("files.dir", revel.BasePath)
 	// TODO 统一目录格式
 	// dir := "files/" + toUserId + "/images"
-	dir := "files/" + GetRandomFilePath(toUserId, guid) + "/images"
-	filePath := dir + "/" + newFilename
-	err := os.MkdirAll(revel.BasePath+dir, 0755)
+	dir := GetRandomFilePath(toUserId, guid) + "/images"
+	filePath := path.Join(dir, newFilename)
+	err := os.MkdirAll(path.Join(basePath, dir), 0755)
 	if err != nil {
 		return false, ""
 	}
 
-	_, err = CopyFile(revel.BasePath+"/"+file.Path, revel.BasePath+"/"+filePath)
+	_, err = CopyFile(path.Join(basePath, file.Path), path.Join(basePath, filePath))
 	if err != nil {
 		return false, ""
 	}

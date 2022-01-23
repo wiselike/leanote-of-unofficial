@@ -8,6 +8,7 @@ import (
 	"github.com/revel/revel"
 	"io"
 	"os"
+	"path"
 	"time"
 )
 
@@ -61,13 +62,13 @@ func (c AdminData) Download(createdTime string) revel.Result {
 	}
 
 	dbname, _ := revel.Config.String("db.dbname")
-	path := backup["path"] + "/" + dbname
-	allFiles := ListDir(path)
+	fpath := backup["path"] + "/" + dbname
+	allFiles := ListDir(fpath)
 
 	filename := "backup_" + dbname + "_" + backup["createdTime"] + ".tar.gz"
 
 	// file write
-	fw, err := os.Create(revel.BasePath + "/files/" + filename)
+	fw, err := os.Create(path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), filename))
 	if err != nil {
 		return c.RenderText("")
 	}
@@ -82,13 +83,12 @@ func (c AdminData) Download(createdTime string) revel.Result {
 
 	// 遍历文件列表
 	for _, file := range allFiles {
-		fn := path + "/" + file
+		fn := fpath + "/" + file
 		fr, err := os.Open(fn)
 		fileInfo, _ := fr.Stat()
 		if err != nil {
 			return c.RenderText("")
 		}
-		defer fr.Close()
 
 		// 信息头
 		h := new(tar.Header)
@@ -108,6 +108,8 @@ func (c AdminData) Download(createdTime string) revel.Result {
 		if err != nil {
 			panic(err)
 		}
+
+		fr.Close()
 	} // for
 
 	return c.RenderBinary(fw, filename, revel.Attachment, time.Now()) // revel.Attachm

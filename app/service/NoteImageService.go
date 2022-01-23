@@ -193,8 +193,9 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 		title = FixFilename(title)
 	}
 	
-	newDbPathDir := path.Join("files", GetRandomFilePath(userId, ""), "/images/", title)
-	newPathDir := path.Join(revel.BasePath, newDbPathDir)
+	basePath := revel.Config.StringDefault("files.dir", revel.BasePath)
+	newDbPathDir := path.Join(GetRandomFilePath(userId, ""), "/images/", title)
+	newPathDir := path.Join(basePath, newDbPathDir)
 	if err := os.MkdirAll(newPathDir, 0755); err!=nil {
 		return
 	}
@@ -204,10 +205,10 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 			file := &info.File{}
 			if db.GetByIdAndUserId(db.Files, each[2], userId, file); file.Path!="" {
 				// 创建文件名，并移动路径
-				oldFullPath := path.Join(revel.BasePath, file.Path)
+				oldFullPath := path.Join(basePath, file.Path)
 				fname := strings.Split(path.Base(file.Path), "_")
 				file.Path = path.Join(newDbPathDir, fmt.Sprintf("%d_%s", i, fname[len(fname)-1]))
-				newFullPath := path.Join(revel.BasePath, file.Path)
+				newFullPath := path.Join(basePath, file.Path)
 				if err := os.Rename(oldFullPath, newFullPath); err==nil {
 					// 更新数据库
 					if ok := db.UpdateByIdAndUserId(db.Files, each[2], userId, file); !ok {

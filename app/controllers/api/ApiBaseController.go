@@ -8,6 +8,7 @@ import (
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"os"
+	"path"
 	//	"fmt"
 	"io/ioutil"
 	//	"fmt"
@@ -82,9 +83,9 @@ func (c ApiBaseContrller) uploadAttach(name string, noteId string) (ok bool, msg
 
 	// 生成上传路径
 	newGuid := NewGuid()
-	filePath :="files/" + GetRandomFilePath(userId, newGuid) + "/attachs"
+	filePath := GetRandomFilePath(userId, newGuid) + "/attachs"
 
-	dir := revel.BasePath + "/" + filePath
+	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), filePath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return
@@ -93,7 +94,7 @@ func (c ApiBaseContrller) uploadAttach(name string, noteId string) (ok bool, msg
 	filename := handel.Filename
 	_, ext := SplitFilename(filename) // .doc
 	filename = newGuid + ext
-	toPath := dir + "/" + filename
+	toPath := path.Join(dir, filename)
 	err = ioutil.WriteFile(toPath, data, 0777)
 	if err != nil {
 		return
@@ -110,7 +111,7 @@ func (c ApiBaseContrller) uploadAttach(name string, noteId string) (ok bool, msg
 		Title:        handel.Filename,
 		NoteId:       bson.ObjectIdHex(noteId),
 		UploadUserId: bson.ObjectIdHex(userId),
-		Path:         filePath + "/" + filename,
+		Path:         path.Join(filePath, filename),
 		Type:         fileType,
 		Size:         filesize}
 
@@ -144,9 +145,9 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 	newGuid := NewGuid()
 	// 生成上传路径
 	userId := c.getUserId()
-	fileUrlPath := "files/" + GetRandomFilePath(userId, newGuid) + "/images"
+	fileUrlPath := GetRandomFilePath(userId, newGuid) + "/images"
 
-	dir := revel.BasePath + "/" + fileUrlPath
+	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fileUrlPath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return
@@ -178,7 +179,7 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 		return
 	}
 
-	toPath := dir + "/" + filename
+	toPath := path.Join(dir, filename)
 	err = ioutil.WriteFile(toPath, data, 0777)
 	if err != nil {
 		return
@@ -187,13 +188,12 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 	_, toPathGif := TransToGif(toPath, 0, true)
 	filename = GetFilename(toPathGif)
 	filesize := GetFilesize(toPathGif)
-	fileUrlPath += "/" + filename
 
 	// File
 	fileInfo := info.File{FileId: bson.NewObjectId(),
 		Name:  filename,
 		Title: handel.Filename,
-		Path:  fileUrlPath,
+		Path:  path.Join(fileUrlPath, filename),
 		Size:  filesize}
 	ok, msg = fileService.AddImage(fileInfo, "", c.getUserId(), true)
 	if ok {

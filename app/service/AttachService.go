@@ -7,6 +7,7 @@ import (
 	"github.com/revel/revel"
 	"gopkg.in/mgo.v2/bson"
 	"os"
+	"path"
 	"strings"
 	"time"
 )
@@ -109,8 +110,7 @@ func (this *AttachService) DeleteAllAttachs(noteId, userId string) bool {
 		attachs := []info.Attach{}
 		db.ListByQ(db.Attachs, bson.M{"NoteId": bson.ObjectIdHex(noteId)}, &attachs)
 		for _, attach := range attachs {
-			attach.Path = strings.TrimLeft(attach.Path, "/")
-			os.Remove(revel.BasePath + "/" + attach.Path)
+			os.Remove(path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), attach.Path))
 		}
 		return true
 	}
@@ -133,7 +133,7 @@ func (this *AttachService) DeleteAttach(attachId, userId string) (bool, string) 
 		if db.Delete(db.Attachs, bson.M{"_id": bson.ObjectIdHex(attachId)}) {
 			this.updateNoteAttachNum(attach.NoteId, -1)
 			attach.Path = strings.TrimLeft(attach.Path, "/")
-			err := os.Remove(revel.BasePath + "/" + attach.Path)
+			err := os.Remove(path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), attach.Path))
 			if err == nil {
 				// userService.UpdateAttachSize(note.UserId.Hex(), -attach.Size)
 				// 修改note Usn
@@ -193,6 +193,7 @@ func (this *AttachService) CopyAttachs(noteId, toNoteId, toUserId string) bool {
 	db.ListByQ(db.Attachs, bson.M{"NoteId": bson.ObjectIdHex(noteId)}, &attachs)
 
 	// 复制之
+	basePath := revel.Config.StringDefault("files.dir", revel.BasePath)
 	toNoteIdO := bson.ObjectIdHex(toNoteId)
 	for _, attach := range attachs {
 		attach.AttachId = ""
@@ -201,13 +202,13 @@ func (this *AttachService) CopyAttachs(noteId, toNoteId, toUserId string) bool {
 		// 文件复制一份
 		_, ext := SplitFilename(attach.Name)
 		newFilename := NewGuid() + ext
-		dir := "files/" + toUserId + "/attachs"
-		filePath := dir + "/" + newFilename
-		err := os.MkdirAll(revel.BasePath+"/"+dir, 0755)
+		dir := toUserId + "/attachs"
+		filePath := path.Join(dir, newFilename)
+		err := os.MkdirAll(path.Join(basePath, dir), 0755)
 		if err != nil {
 			return false
 		}
-		_, err = CopyFile(revel.BasePath+"/"+attach.Path, revel.BasePath+"/"+filePath)
+		_, err = CopyFile(path.Join(basePath, attach.Path), path.Join(basePath, filePath))
 		if err != nil {
 			return false
 		}
