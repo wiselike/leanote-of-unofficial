@@ -39,7 +39,7 @@ func ProcessSource(revelContainer *model.RevelContainer) (sourceInfo *model.Sour
 }
 
 func NewSourceProcessor(revelContainer *model.RevelContainer) *SourceProcessor {
-	s := &SourceProcessor{revelContainer:revelContainer, log:utils.Logger.New("parser", "SourceProcessor")}
+	s := &SourceProcessor{revelContainer: revelContainer, log: utils.Logger.New("parser", "SourceProcessor")}
 	s.sourceInfoProcessor = NewSourceInfoProcessor(s)
 	return s
 }
@@ -110,7 +110,7 @@ func (s *SourceProcessor) fsWalk(fname string, linkName string, walkFn filepath.
 			return filepath.SkipDir
 		}
 
-		if err == nil && info.Mode() & os.ModeSymlink == os.ModeSymlink {
+		if err == nil && info.Mode()&os.ModeSymlink == os.ModeSymlink {
 			var symlinkPath string
 			symlinkPath, err = filepath.EvalSymlinks(path)
 			if err != nil {
@@ -140,15 +140,14 @@ func (s *SourceProcessor) fsWalk(fname string, linkName string, walkFn filepath.
 func (s *SourceProcessor) addPackages() (err error) {
 	allPackages := []string{model.RevelImportPath + "/..."}
 	for _, module := range s.revelContainer.ModulePathMap {
-		allPackages = append(allPackages, module.ImportPath + "/...") // +"/app/controllers/...")
+		allPackages = append(allPackages, module.ImportPath+"/...") // +"/app/controllers/...")
 	}
 	s.log.Info("Reading packages", "packageList", allPackages)
 	//allPackages = []string{s.revelContainer.ImportPath + "/..."} //+"/app/controllers/..."}
 
 	config := &packages.Config{
 		// ode: packages.NeedSyntax | packages.NeedCompiledGoFiles,
-		Mode:
-		packages.NeedTypes | // For compile error
+		Mode: packages.NeedTypes | // For compile error
 			packages.NeedDeps | // To load dependent files
 			packages.NeedName | // Loads the full package name
 			packages.NeedSyntax, // To load ast tree (for end points)
@@ -164,7 +163,7 @@ func (s *SourceProcessor) addPackages() (err error) {
 		//	packages.LoadTypes | packages.NeedTypes | packages.NeedDeps,  //, // |
 		// packages.NeedTypes, // packages.LoadTypes | packages.NeedSyntax | packages.NeedTypesInfo,
 		//packages.LoadSyntax | packages.NeedDeps,
-		Dir:s.revelContainer.AppPath,
+		Dir: s.revelContainer.AppPath,
 	}
 	s.packageList, err = packages.Load(config, allPackages...)
 	s.log.Info("Loaded modules ", "len results", len(s.packageList), "error", err)
@@ -193,7 +192,7 @@ func (s *SourceProcessor) processPath(path string, info os.FileInfo, err error) 
 	pkgImportPath := s.revelContainer.ImportPath
 	appPath := s.revelContainer.BasePath
 	if appPath != path {
-		pkgImportPath = s.revelContainer.ImportPath + "/" + filepath.ToSlash(path[len(appPath) + 1:])
+		pkgImportPath = s.revelContainer.ImportPath + "/" + filepath.ToSlash(path[len(appPath)+1:])
 	}
 	s.log.Info("Processing source package folder", "package", pkgImportPath, "path", path)
 
@@ -240,7 +239,7 @@ func (s *SourceProcessor) processPath(path string, info os.FileInfo, err error) 
 	// These cannot be included in source code that is not generated specifically as a test
 	for i := range pkgMap {
 		if len(i) > 6 {
-			if string(i[len(i) - 5:]) == "_test" {
+			if string(i[len(i)-5:]) == "_test" {
 				delete(pkgMap, i)
 			}
 		}

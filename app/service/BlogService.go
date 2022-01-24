@@ -303,7 +303,9 @@ func (this *BlogService) SearchBlogByTags(tags []string, userId string, sortFiel
 
 	// 总记录数
 	count, _ := q.Count()
-	if count == 0 { return }
+	if count == 0 {
+		return
+	}
 
 	q.Sort(sortFieldR).
 		All(&notes)
@@ -319,15 +321,17 @@ func (this *BlogService) SearchBlogByCate(notebookId, userId, sortField string, 
 	sortFieldR := parseSort(sortField, isAsc)
 
 	query := bson.M{"UserId": bson.ObjectIdHex(userId),
-		"IsTrash":   false,
-		"IsDeleted": false,
-		"IsBlog":    true,
+		"IsTrash":          false,
+		"IsDeleted":        false,
+		"IsBlog":           true,
 		"Cates.NotebookId": bson.M{"$in": []string{notebookId}}}
 	q := db.Notes.Find(query)
 
 	// 总记录数
 	count, _ := q.Count()
-	if count == 0 { return }
+	if count == 0 {
+		return
+	}
 
 	q.Sort(sortFieldR).All(&notes)
 

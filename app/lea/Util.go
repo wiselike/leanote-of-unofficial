@@ -46,7 +46,7 @@ func NewGuid() string {
 	// b := make([]byte, 48)
 
 	// if _, err := io.ReadFull(rand.Reader, b); err != nil {
-		// return ""
+	// return ""
 	// }
 	// return Md5(base64.URLEncoding.EncodeToString(b))
 	return fmt.Sprintf("%d", time.Now().UnixNano())

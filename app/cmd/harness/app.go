@@ -11,8 +11,8 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"time"
 	"sync"
+	"time"
 
 	"github.com/revel/cmd/model"
 	"github.com/revel/cmd/utils"
@@ -31,7 +31,7 @@ type App struct {
 
 // NewApp returns app instance with binary path in it
 func NewApp(binPath string, paths *model.RevelContainer, packagePathMap map[string]string) *App {
-	return &App{BinaryPath: binPath, Paths: paths, Port: paths.HTTPPort, PackagePathMap:packagePathMap}
+	return &App{BinaryPath: binPath, Paths: paths, Port: paths.HTTPPort, PackagePathMap: packagePathMap}
 }
 
 // Cmd returns a command to run the app server using the current configuration.
@@ -74,9 +74,9 @@ func (cmd AppCmd) Start(c *model.CommandConfig) error {
 	select {
 	case exitState := <-cmd.waitChan():
 		fmt.Println("Startup failure view previous messages, \n Proxy is listening :", c.Run.Port)
-		err := utils.NewError("", "Revel Run Error", "starting your application there was an exception. See terminal output, " + exitState, "")
-	// TODO pretiffy command line output
-	// err.MetaError = listeningWriter.getLastOutput()
+		err := utils.NewError("", "Revel Run Error", "starting your application there was an exception. See terminal output, "+exitState, "")
+		// TODO pretiffy command line output
+		// err.MetaError = listeningWriter.getLastOutput()
 		return err
 
 	case <-time.After(60 * time.Second):
@@ -149,14 +149,13 @@ func (cmd AppCmd) Kill() {
 			return
 		}
 
-
 		// Use a timer to ensure that the process exits
 		utils.Logger.Info("Waiting to exit")
 		select {
 		case <-ch:
 			return
 		case <-time.After(60 * time.Second):
-		// Kill the process
+			// Kill the process
 			utils.Logger.Error(
 				"Revel app failed to exit in 60 seconds - killing.",
 				"processid", cmd.Process.Pid,
@@ -216,4 +215,3 @@ func (w *startupListeningWriter) Write(p []byte) (int, error) {
 func (w *startupListeningWriter) getLastOutput() string {
 	return w.buffer.String()
 }
-

@@ -61,7 +61,7 @@ func (c BaseController) GetUsername() string {
 
 // 得到用户信息
 func (c BaseController) GetUserInfo() info.User {
-    userId := c.GetUserId()
+	userId := c.GetUserId()
 	if userId != "" {
 		return userService.GetUserInfo(userId)
 	}
@@ -69,7 +69,7 @@ func (c BaseController) GetUserInfo() info.User {
 }
 
 func (c BaseController) GetUserAndBlogUrl() info.UserAndBlogUrl {
-    userId := c.GetUserId()
+	userId := c.GetUserId()
 	if userId != "" {
 		return userService.GetUserAndBlogUrl(userId)
 	}
@@ -208,7 +208,7 @@ func (c BaseController) RenderTemplateStr(templatePath string) string {
 	}
 
 	tpl := &revel.RenderTemplateResult{
-		Template:   template,
+		Template: template,
 		ViewArgs: c.ViewArgs, // 把args给它
 	}
 

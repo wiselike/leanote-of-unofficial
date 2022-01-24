@@ -232,7 +232,7 @@ func UpdateByIdAndUserIdMap2(collection *mgo.Collection, id, userId bson.ObjectI
 
 func GetNoteHistoriesCount(collection *mgo.Collection, noteId, userId string) int {
 	res := bson.M{}
-	collection.Pipe([]bson.M{{"$match":GetIdAndUserIdQ(noteId, userId)},{"$project":bson.M{"count":bson.M{"$size":"$Histories"}}}}).One(&res)
+	collection.Pipe([]bson.M{{"$match": GetIdAndUserIdQ(noteId, userId)}, {"$project": bson.M{"count": bson.M{"$size": "$Histories"}}}}).One(&res)
 	if count, ok := res["count"]; ok {
 		return count.(int)
 	}

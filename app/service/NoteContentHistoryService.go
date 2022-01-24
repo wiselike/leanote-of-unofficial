@@ -22,11 +22,11 @@ func (this *NoteContentHistoryService) AddHistory(noteId, userId string, oneHist
 
 	// 每个历史记录最大值
 	maxSize := ConfigS.GlobalAllConfigs["note.history.size"].(int)
-	if maxSize<1 {
+	if maxSize < 1 {
 		return
 	}
 
-//注释掉下面这个块，使用mongodb3的块，可以优化速度和效率
+	//注释掉下面这个块，使用mongodb3的块，可以优化速度和效率
 	history := info.NoteContentHistory{}
 	db.GetByIdAndUserId(db.NoteContentHistories, noteId, userId, &history) // TODO 优化掉, 只获取数字即可
 	var historiesLenth int
@@ -36,10 +36,10 @@ func (this *NoteContentHistoryService) AddHistory(noteId, userId string, oneHist
 		historiesLenth = len(history.Histories)
 	}
 
-/* mongodb3才支持
+	/* mongodb3才支持
 	// 优化为只获取数字，不获取所有历史的正文
 	historiesLenth := db.GetNoteHistoriesCount(db.NoteContentHistories, noteId, userId)
-*/
+	*/
 
 	if historiesLenth == -1 {
 		this.newHistory(noteId, userId, oneHistory)

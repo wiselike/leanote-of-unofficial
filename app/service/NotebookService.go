@@ -96,7 +96,7 @@ func ParseAndSortNotebooks(userNotebooks []info.Notebook, noParentDelete, needSo
 }
 
 // 得到 notebook 的分类及父分类 ["Life": {}, "Life1": {}, "Life11": {}] 层级关系：Life -> Life.1 -> Life.1.1
-func (this *NotebookService) GetNotebookIdsAndTitles (notebookId, userId string) (cates []map[string]string) {
+func (this *NotebookService) GetNotebookIdsAndTitles(notebookId, userId string) (cates []map[string]string) {
 	i := 0
 	for i < 10 { // 最多10层分类
 		notebook := notebookService.GetNotebook(notebookId, userId)
@@ -152,13 +152,15 @@ func (this *NotebookService) GetNotebooksRaw(userId, sortField string) []info.No
 		bson.M{"IsDeleted": bson.M{"$exists": false}},
 	}
 	q := db.Notebooks.Find(bson.M{"UserId": bson.ObjectIdHex(userId), "$or": orQ})
-	if sortField != "" {q = q.Sort(sortField)}
+	if sortField != "" {
+		q = q.Sort(sortField)
+	}
 	q.All(&userNotebooks)
 
 	if len(userNotebooks) == 0 {
 		return nil
 	}
-	
+
 	return userNotebooks
 }
 
@@ -176,7 +178,7 @@ func (this *NotebookService) GetNotebooks(userId string) info.SubNotebooks {
 	if len(userNotebooks) == 0 {
 		return nil
 	}
-	
+
 	return ParseAndSortNotebooks(userNotebooks, true, true)
 }
 
@@ -195,7 +197,7 @@ func (this *NotebookService) GetNotebooksByNotebookIds(notebookIds []bson.Object
 }
 
 // 更新父的ChildNotebookIds
-func (this *NotebookService) UpdateNotebookChilds (notebookId, childNotebookId, userId, method string) (bool, info.Notebook) {
+func (this *NotebookService) UpdateNotebookChilds(notebookId, childNotebookId, userId, method string) (bool, info.Notebook) {
 	notebook := this.GetNotebook(notebookId, userId)
 	if method == "Add" {
 		notebook.ChildNotebookIds = append(notebook.ChildNotebookIds, bson.ObjectIdHex(childNotebookId))
@@ -277,7 +279,7 @@ func (this *NotebookService) IsBlog(notebookId string) bool {
 // 判断 Notebook 中是否含有 blog 并返回包含 blog 数量
 func (this *NotebookService) HasBlog(notebookId string) int {
 	return db.Count(db.Notes, bson.M{"IsBlog": true, "IsTrash": false, "IsDeleted": false,
-			"Cates.NotebookId": bson.M{"$in": []string{notebookId} } })
+		"Cates.NotebookId": bson.M{"$in": []string{notebookId}}})
 }
 
 // 判断是否是我的notebook

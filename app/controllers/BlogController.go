@@ -199,7 +199,9 @@ func (c Blog) getCates(userBlog info.UserBlog) {
 	userId := userBlog.UserId.Hex()
 
 	notebooks := notebookService.GetNotebooksRaw(userId, "Title")
-	if len(notebooks) == 0 {return}
+	if len(notebooks) == 0 {
+		return
+	}
 
 	for _, notebook := range notebooks {
 		notebookId := notebook.NotebookId.Hex()
@@ -219,7 +221,7 @@ func (c Blog) getCates(userBlog info.UserBlog) {
 						}
 					}
 					// childCates 按 Title 升序排序
-					sort.Slice(childCates, func(i,j int)bool{return childCates[i]["Title"].(string) < childCates[j]["Title"].(string)})
+					sort.Slice(childCates, func(i, j int) bool { return childCates[i]["Title"].(string) < childCates[j]["Title"].(string) })
 				}
 
 				cate := map[string]interface{}{"Title": notebook.Title, "UrlTitle": notebook.UrlTitle, "CateId": notebookId,
@@ -231,6 +233,7 @@ func (c Blog) getCates(userBlog info.UserBlog) {
 
 	c.ViewArgs["cates"] = cates
 }
+
 // cates = [{title:"xxx", cateId: "xxxx"}, {}]
 // func (c Blog) getCateUrlTitle(n *info.Notebook) string {
 // 	if n.UrlTitle != "" {

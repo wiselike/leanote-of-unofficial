@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
 	"fmt"
 	"github.com/leanote/leanote/app/info"
-	"github.com/leanote/leanote/app/service"
 	. "github.com/leanote/leanote/app/lea"
 	"github.com/leanote/leanote/app/lea/netutil"
+	"github.com/leanote/leanote/app/service"
+	"github.com/revel/revel"
 	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"os"
@@ -110,7 +110,6 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 	// defer file.Close()
 
 	// data, err := ioutil.ReadAll(file)
-	
 
 	// 生成文件扩展名
 	newGuid := NewGuid()

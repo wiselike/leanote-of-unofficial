@@ -2,13 +2,13 @@ package i18n
 
 import (
 	"fmt"
+	. "github.com/leanote/leanote/app/lea"
 	"github.com/revel/revel"
 	"github.com/robfig/config"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-	. "github.com/leanote/leanote/app/lea"
 )
 
 const (

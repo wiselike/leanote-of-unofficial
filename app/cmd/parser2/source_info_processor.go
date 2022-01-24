@@ -1,14 +1,14 @@
 package parser2
 
 import (
-	"github.com/revel/cmd/utils"
-	"golang.org/x/tools/go/packages"
+	"github.com/revel/cmd/logger"
 	"github.com/revel/cmd/model"
+	"github.com/revel/cmd/utils"
 	"go/ast"
 	"go/token"
-	"strings"
+	"golang.org/x/tools/go/packages"
 	"path/filepath"
-	"github.com/revel/cmd/logger"
+	"strings"
 )
 
 type (
@@ -18,7 +18,7 @@ type (
 )
 
 func NewSourceInfoProcessor(sourceProcessor *SourceProcessor) *SourceInfoProcessor {
-	return &SourceInfoProcessor{sourceProcessor:sourceProcessor}
+	return &SourceInfoProcessor{sourceProcessor: sourceProcessor}
 }
 
 func (s *SourceInfoProcessor) processPackage(p *packages.Package) (sourceInfo *model.SourceInfo) {
@@ -69,7 +69,7 @@ func (s *SourceInfoProcessor) processPackage(p *packages.Package) (sourceInfo *m
 				}
 				// Check for validation
 				if lineKeyMap := s.getValidation(funcDecl, p); len(lineKeyMap) > 1 {
-					sourceInfo.ValidationKeys[p.PkgPath + "." + s.getFuncName(funcDecl)] = lineKeyMap
+					sourceInfo.ValidationKeys[p.PkgPath+"."+s.getFuncName(funcDecl)] = lineKeyMap
 				}
 				if funcDecl.Name.Name == "init" {
 					sourceInfo.InitImportPaths = append(sourceInfo.InitImportPaths, p.PkgPath)
@@ -85,6 +85,7 @@ func (s *SourceInfoProcessor) processPackage(p *packages.Package) (sourceInfo *m
 
 	return
 }
+
 // Scan app source code for calls to X.Y(), where X is of type *Validation.
 //
 // Recognize these scenarios:
@@ -99,7 +100,7 @@ func (s *SourceInfoProcessor) processPackage(p *packages.Package) (sourceInfo *m
 //
 // The end result is that we can set the default validation key for each call to
 // be the same as the local variable.
-func (s *SourceInfoProcessor) getValidation(funcDecl *ast.FuncDecl, p *packages.Package) (map[int]string) {
+func (s *SourceInfoProcessor) getValidation(funcDecl *ast.FuncDecl, p *packages.Package) map[int]string {
 	var (
 		lineKeys = make(map[int]string)
 
@@ -167,8 +168,9 @@ func (s *SourceInfoProcessor) getValidation(funcDecl *ast.FuncDecl, p *packages.
 	return lineKeys
 
 }
+
 // Check to see if there is a *revel.Validation as an argument.
-func (s *SourceInfoProcessor)  getValidationParameter(funcDecl *ast.FuncDecl) *ast.Object {
+func (s *SourceInfoProcessor) getValidationParameter(funcDecl *ast.FuncDecl) *ast.Object {
 	for _, field := range funcDecl.Type.Params.List {
 		starExpr, ok := field.Type.(*ast.StarExpr) // e.g. *revel.Validation
 		if !ok {
@@ -342,9 +344,9 @@ func (s *SourceInfoProcessor) getControllerSpec(spec *ast.TypeSpec, p *packages.
 		} else {
 			var ok bool
 			if importPath, ok = localImportMap[pkgName]; !ok {
-				log.Debug("Debug: Unusual, failed to find package locally ", "package", pkgName, "type", typeName, "map", s.sourceProcessor.importMap, "usedin", )
+				log.Debug("Debug: Unusual, failed to find package locally ", "package", pkgName, "type", typeName, "map", s.sourceProcessor.importMap, "usedin")
 				if importPath, ok = s.sourceProcessor.importMap[pkgName]; !ok {
-					log.Error("Error: Failed to find import path for ", "package", pkgName, "type", typeName, "map", s.sourceProcessor.importMap, "usedin", )
+					log.Error("Error: Failed to find import path for ", "package", pkgName, "type", typeName, "map", s.sourceProcessor.importMap, "usedin")
 					continue
 				}
 			}
@@ -412,11 +414,11 @@ func (s *SourceInfoProcessor) addImport(decl ast.Decl, p *packages.Package, loca
 				}
 			}
 			quotedPath := importSpec.Path.Value           // e.g. "\"sample/app/models\""
-			fullPath := quotedPath[1 : len(quotedPath) - 1] // Remove the quotes
+			fullPath := quotedPath[1 : len(quotedPath)-1] // Remove the quotes
 			if pkgAlias == "" {
 				pkgAlias = fullPath
 				if index := strings.LastIndex(pkgAlias, "/"); index > 0 {
-					pkgAlias = pkgAlias[index + 1:]
+					pkgAlias = pkgAlias[index+1:]
 				}
 			}
 			localImportMap[pkgAlias] = fullPath

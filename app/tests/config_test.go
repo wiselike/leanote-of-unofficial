@@ -1,8 +1,8 @@
 package tests
 
 import (
-	"github.com/revel/revel"
 	"github.com/leanote/leanote/app/db"
+	"github.com/revel/revel"
 	"testing"
 	//	. "github.com/leanote/leanote/app/lea"
 	"github.com/leanote/leanote/app/service"

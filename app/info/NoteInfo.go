@@ -18,8 +18,8 @@ type Note struct {
 
 	Src string `Src,omitempty` // 来源, 2016/4/22
 
-	ImgSrc string   `ImgSrc` // 图片, 第一张缩略图地址
-	Tags   []string `Tags,omitempty`
+	ImgSrc string              `ImgSrc` // 图片, 第一张缩略图地址
+	Tags   []string            `Tags,omitempty`
 	Cates  []map[string]string `Cates,omitempty` // 笔记的分类
 
 	IsTrash bool `IsTrash` // 是否是trash, 默认是false
@@ -85,6 +85,7 @@ type EachHistory struct {
 	Content       string        `Content`
 }
 type EachHistorySlice []EachHistory
+
 // EachHistory sort
 func (this EachHistorySlice) Len() int {
 	return len(this)

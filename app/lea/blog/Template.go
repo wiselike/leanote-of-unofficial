@@ -39,7 +39,7 @@ var CloneTemplate *template.Template
 type RenderTemplateResult struct {
 	Template    *template.Template
 	PathContent map[string]string
-	ViewArgs map[string]interface{}
+	ViewArgs    map[string]interface{}
 
 	IsPreview  bool // 是否是预览
 	CurBlogTpl *BlogTpl
@@ -162,7 +162,7 @@ func RenderTemplate(name string, args map[string]interface{}, basePath string, i
 		r = &RenderTemplateResult{
 			Template:    t,
 			PathContent: BlogTplObject.PathContent, // 为了显示错误
-			ViewArgs:  args,                      // 把args给它
+			ViewArgs:    args,                      // 把args给它
 		}
 	} else {
 		// 复制一份
@@ -202,7 +202,7 @@ func RenderTemplate(name string, args map[string]interface{}, basePath string, i
 		r = &RenderTemplateResult{
 			Template:    t,
 			PathContent: newBlogTplObject.PathContent, // 为了显示错误
-			ViewArgs:  args,
+			ViewArgs:    args,
 			CurBlogTpl:  newBlogTplObject,
 			IsPreview:   isPreview,
 		}
@@ -215,7 +215,7 @@ func RenderTemplate(name string, args map[string]interface{}, basePath string, i
 //
 
 type ErrorResult struct {
-	ViewArgs map[string]interface{}
+	ViewArgs   map[string]interface{}
 	Error      error
 	IsPreview  bool
 	CurBlogTpl *BlogTpl

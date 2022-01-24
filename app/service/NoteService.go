@@ -207,7 +207,7 @@ func (this *NoteService) ListNotes(userId, notebookId string,
 		sortFieldList = append(sortFieldList, "-IsTop")
 	}
 	sortFieldList = append(sortFieldList, sortFieldR)
-	
+
 	if notebookId != "" {
 		query["NotebookId"] = bson.ObjectIdHex(notebookId)
 	}
