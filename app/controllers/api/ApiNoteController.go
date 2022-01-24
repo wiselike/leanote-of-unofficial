@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/revel/revel"
 	"github.com/leanote/leanote/app/info"
+	"github.com/leanote/leanote/app/service"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
 	"os"
@@ -586,7 +587,7 @@ func (c ApiNote) ExportPdf(noteId string) revel.Result {
 	// path 判断是否需要重新生成之
 	guid := NewGuid()
 	fileUrlPath := "export_pdf"
-	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fileUrlPath)
+	dir := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], fileUrlPath)
 	if !MkdirAll(dir) {
 		re.Msg = "noDir"
 		return c.RenderJSON(re)

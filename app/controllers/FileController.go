@@ -4,6 +4,7 @@ import (
 	"github.com/revel/revel"
 	"fmt"
 	"github.com/leanote/leanote/app/info"
+	"github.com/leanote/leanote/app/service"
 	. "github.com/leanote/leanote/app/lea"
 	"github.com/leanote/leanote/app/lea/netutil"
 	"gopkg.in/mgo.v2/bson"
@@ -121,7 +122,7 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 		dir = path.Join(revel.BasePath, fileUrlPath)
 	} else {
 		fileUrlPath = GetRandomFilePath(userId, newGuid) + "/images"
-		dir = path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fileUrlPath)
+		dir = path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], fileUrlPath)
 	}
 
 	err := os.MkdirAll(dir, 0755)
@@ -228,7 +229,7 @@ func (c File) OutputImage(noteId, fileId string) revel.Result {
 	if fpath == "" {
 		return c.RenderText("")
 	}
-	fn := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fpath)
+	fn := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], fpath)
 	file, _ := os.Open(fn)
 	return c.RenderFile(file, revel.Inline) // revel.Attachment
 }
@@ -250,7 +251,7 @@ func (c File) CopyHttpImage(src string) revel.Result {
 	// newGuid := NewGuid()
 	userId := c.GetUserId()
 	fileUrlPath := GetRandomFilePath(userId, "") + "/images"
-	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fileUrlPath)
+	dir := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], fileUrlPath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return c.RenderJSON(re)

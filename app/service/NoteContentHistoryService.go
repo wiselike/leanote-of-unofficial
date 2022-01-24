@@ -3,7 +3,6 @@ package service
 import (
 	"github.com/leanote/leanote/app/db"
 	"github.com/leanote/leanote/app/info"
-	"github.com/revel/revel"
 	//	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
 	"sort"
@@ -22,7 +21,7 @@ func (this *NoteContentHistoryService) AddHistory(noteId, userId string, oneHist
 	}
 
 	// 每个历史记录最大值
-	var maxSize = revel.Config.IntDefault("note.history.size", 10)
+	maxSize := ConfigS.GlobalAllConfigs["note.history.size"].(int)
 	if maxSize<1 {
 		return
 	}
