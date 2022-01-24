@@ -6,7 +6,6 @@ import (
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
-	"github.com/revel/revel"
 	"os"
 	"path"
 	"strings"
@@ -193,7 +192,7 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 		title = FixFilename(title)
 	}
 	
-	basePath := revel.Config.StringDefault("files.dir", revel.BasePath)
+	basePath := ConfigS.GlobalStringConfigs["files.dir"]
 	newDbPathDir := path.Join(GetRandomFilePath(userId, ""), "/images/", title)
 	newPathDir := path.Join(basePath, newDbPathDir)
 	if err := os.MkdirAll(newPathDir, 0755); err!=nil {

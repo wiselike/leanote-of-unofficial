@@ -1,10 +1,10 @@
 package api
 
 import (
-	"github.com/revel/revel"
 	"gopkg.in/mgo.v2/bson"
 	//	"encoding/json"
 	"github.com/leanote/leanote/app/controllers"
+	"github.com/leanote/leanote/app/service"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"os"
@@ -85,7 +85,7 @@ func (c ApiBaseContrller) uploadAttach(name string, noteId string) (ok bool, msg
 	newGuid := NewGuid()
 	filePath := GetRandomFilePath(userId, newGuid) + "/attachs"
 
-	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), filePath)
+	dir := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], filePath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return
@@ -147,7 +147,7 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 	userId := c.getUserId()
 	fileUrlPath := GetRandomFilePath(userId, newGuid) + "/images"
 
-	dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fileUrlPath)
+	dir := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], fileUrlPath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		return

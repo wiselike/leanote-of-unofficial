@@ -72,6 +72,10 @@ func (this *ConfigService) InitGlobalConfigs() bool {
 	if s, ok := this.GlobalStringConfigs["siteUrl"]; !ok || s != this.siteUrl {
 		this.UpdateGlobalStringConfig(this.adminUserId, "siteUrl", this.siteUrl)
 	}
+	// files.dir
+	this.GlobalStringConfigs["files.dir"] = revel.Config.StringDefault("files.dir", revel.BasePath)
+	// note.history.size
+	this.GlobalAllConfigs["note.history.size"] = revel.Config.IntDefault("note.history.size", 10)
 
 	return true
 }

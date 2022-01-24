@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"github.com/leanote/leanote/app/info"
+	"github.com/leanote/leanote/app/service"
 	. "github.com/leanote/leanote/app/lea"
 	"github.com/revel/revel"
 	"io"
@@ -68,7 +69,7 @@ func (c AdminData) Download(createdTime string) revel.Result {
 	filename := "backup_" + dbname + "_" + backup["createdTime"] + ".tar.gz"
 
 	// file write
-	fw, err := os.Create(path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), filename))
+	fw, err := os.Create(path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], filename))
 	if err != nil {
 		return c.RenderText("")
 	}

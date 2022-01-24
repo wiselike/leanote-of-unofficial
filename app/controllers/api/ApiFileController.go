@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/revel/revel"
+	"github.com/leanote/leanote/app/service"
 	//	"encoding/json"
 	//	. "github.com/leanote/leanote/app/lea"
 	//	"gopkg.in/mgo.v2/bson"
@@ -65,7 +66,7 @@ func (c ApiFile) GetImage(fileId string) revel.Result {
 	if fpath == "" {
 		return c.RenderText("")
 	}
-	fn := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fpath)
+	fn := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], fpath)
 	file, _ := os.Open(fn)
 	return c.RenderFile(file, revel.Inline) // revel.Attachment
 }
@@ -78,7 +79,7 @@ func (c ApiFile) GetAttach(fileId string) revel.Result {
 	if fpath == "" {
 		return c.RenderText("No Such File")
 	}
-	fn := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fpath)
+	fn := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], fpath)
 	file, _ := os.Open(fn)
 	return c.RenderBinary(file, attach.Title, revel.Attachment, time.Now()) // revel.Attachment
 }
@@ -97,7 +98,7 @@ func (c ApiFile) GetAllAttachs(noteId string) revel.Result {
 	}
 
 	/*
-		dir := path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), "/files/tmp")
+		dir := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "/files/tmp")
 		err := os.MkdirAll(dir, 0755)
 		if err != nil {
 			return c.RenderText("")
@@ -109,7 +110,7 @@ func (c ApiFile) GetAllAttachs(noteId string) revel.Result {
 		filename = "all.tar.gz"
 	}
 
-	basePath := revel.Config.StringDefault("files.dir", revel.BasePath)
+	basePath := service.ConfigS.GlobalStringConfigs["files.dir"]
 	// file write
 	fw, err := os.Create(path.Join(basePath, filename))
 	if err != nil {

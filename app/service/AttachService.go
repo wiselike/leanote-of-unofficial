@@ -4,7 +4,6 @@ import (
 	"github.com/leanote/leanote/app/db"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
-	"github.com/revel/revel"
 	"gopkg.in/mgo.v2/bson"
 	"os"
 	"path"
@@ -110,7 +109,7 @@ func (this *AttachService) DeleteAllAttachs(noteId, userId string) bool {
 		attachs := []info.Attach{}
 		db.ListByQ(db.Attachs, bson.M{"NoteId": bson.ObjectIdHex(noteId)}, &attachs)
 		for _, attach := range attachs {
-			os.Remove(path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), attach.Path))
+			os.Remove(path.Join(ConfigS.GlobalStringConfigs["files.dir"], attach.Path))
 		}
 		return true
 	}
@@ -133,7 +132,7 @@ func (this *AttachService) DeleteAttach(attachId, userId string) (bool, string) 
 		if db.Delete(db.Attachs, bson.M{"_id": bson.ObjectIdHex(attachId)}) {
 			this.updateNoteAttachNum(attach.NoteId, -1)
 			attach.Path = strings.TrimLeft(attach.Path, "/")
-			err := os.Remove(path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), attach.Path))
+			err := os.Remove(path.Join(ConfigS.GlobalStringConfigs["files.dir"], attach.Path))
 			if err == nil {
 				// userService.UpdateAttachSize(note.UserId.Hex(), -attach.Size)
 				// 修改note Usn
@@ -193,7 +192,7 @@ func (this *AttachService) CopyAttachs(noteId, toNoteId, toUserId string) bool {
 	db.ListByQ(db.Attachs, bson.M{"NoteId": bson.ObjectIdHex(noteId)}, &attachs)
 
 	// 复制之
-	basePath := revel.Config.StringDefault("files.dir", revel.BasePath)
+	basePath := ConfigS.GlobalStringConfigs["files.dir"]
 	toNoteIdO := bson.ObjectIdHex(toNoteId)
 	for _, attach := range attachs {
 		attach.AttachId = ""

@@ -102,7 +102,7 @@ func (this *FileService) DeleteImage(userId, fileId string) (bool, string) {
 				Log(file.Path)
 				err = os.Remove(path.Join(revel.BasePath, "/public/", file.Path))
 			} else {
-				err = os.Remove(path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), file.Path))
+				err = os.Remove(path.Join(ConfigS.GlobalStringConfigs["files.dir"], file.Path))
 			}
 			if err == nil {
 				return true, ""
@@ -130,7 +130,7 @@ func (this *FileService) GetFileBase64(userId, fileId string) (str string, mine 
 	if fpath == "" {
 		return "", ""
 	}
-	fpath = path.Join(revel.Config.StringDefault("files.dir", revel.BasePath), fpath)
+	fpath = path.Join(ConfigS.GlobalStringConfigs["files.dir"], fpath)
 
 	ff, err := ioutil.ReadFile(fpath)
 	if err != nil {
@@ -262,7 +262,7 @@ func (this *FileService) CopyImage(userId, fileId, toUserId string) (bool, strin
 	guid := NewGuid()
 	newFilename := guid + ext
 
-	basePath := revel.Config.StringDefault("files.dir", revel.BasePath)
+	basePath := ConfigS.GlobalStringConfigs["files.dir"]
 	// TODO 统一目录格式
 	// dir := "files/" + toUserId + "/images"
 	dir := GetRandomFilePath(toUserId, guid) + "/images"
