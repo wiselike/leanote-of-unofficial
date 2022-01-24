@@ -19,7 +19,7 @@ func parsePageAndSort(pageNumber, pageSize int, sortField string, isAsc bool) (s
 }
 
 // 只排序 不分页
-func parseSort (sortField string, isAsc bool) (sortFieldR string) {
+func parseSort(sortField string, isAsc bool) (sortFieldR string) {
 	if sortField == "" {
 		sortField = "UpdatedTime"
 	}

@@ -8,8 +8,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"os"
 	"path"
-	"strings"
 	"regexp"
+	"strings"
 	//	"time"
 )
 
@@ -181,34 +181,34 @@ func (this *NoteImageService) getImagesByNoteIds(noteIds []bson.ObjectId) map[st
 func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) (rmDir string) {
 	// 获取所有的imgId
 	find := noteImageReg.FindAllStringSubmatch(content, -1) // 查找
-	if find==nil || len(find)<1 {
+	if find == nil || len(find) < 1 {
 		return
 	}
 
 	// 格式化titile
-	if title=="" {
+	if title == "" {
 		title = "empty-titles-set"
 	} else {
 		title = FixFilename(title)
 	}
-	
+
 	basePath := ConfigS.GlobalStringConfigs["files.dir"]
 	newDbPathDir := path.Join(GetRandomFilePath(userId, ""), "/images/", title)
 	newPathDir := path.Join(basePath, newDbPathDir)
-	if err := os.MkdirAll(newPathDir, 0755); err!=nil {
+	if err := os.MkdirAll(newPathDir, 0755); err != nil {
 		return
 	}
 	for i, each := range find {
 		if each != nil && len(each) == 3 {
 			// 查找原路径
 			file := &info.File{}
-			if db.GetByIdAndUserId(db.Files, each[2], userId, file); file.Path!="" {
+			if db.GetByIdAndUserId(db.Files, each[2], userId, file); file.Path != "" {
 				// 创建文件名，并移动路径
 				oldFullPath := path.Join(basePath, file.Path)
 				fname := strings.Split(path.Base(file.Path), "_")
 				file.Path = path.Join(newDbPathDir, fmt.Sprintf("%d_%s", i, fname[len(fname)-1]))
 				newFullPath := path.Join(basePath, file.Path)
-				if err := os.Rename(oldFullPath, newFullPath); err==nil {
+				if err := os.Rename(oldFullPath, newFullPath); err == nil {
 					// 更新数据库
 					if ok := db.UpdateByIdAndUserId(db.Files, each[2], userId, file); !ok {
 						// 数据库写失败，回滚
@@ -216,21 +216,21 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 						continue
 					}
 					// 保存第一张图片的文件夹，作为旧路径，用于删除
-					if rmDir=="" {
+					if rmDir == "" {
 						rmDir = path.Dir(oldFullPath)
 					}
 				}
 			}
 		}
 	}
-	
+
 	// 没有移动任何图片的话，则仅删除空文件夹
-	if rmDir=="" {
+	if rmDir == "" {
 		os.Remove(newPathDir)
 		return
 	}
-	if strings.HasPrefix(newPathDir, rmDir+"/") {    // 带文件夹结束符，避免比较到部分文件名
-		return ""	// 避免把自己给删了
+	if strings.HasPrefix(newPathDir, rmDir+"/") { // 带文件夹结束符，避免比较到部分文件名
+		return "" // 避免把自己给删了
 	}
 	return
 }
@@ -240,16 +240,16 @@ func (this *NoteImageService) ReOrganizeImageFiles(userId, noteId, title, conten
 	if !hasTitle && !hasContent {
 		return true
 	}
-	if !hasTitle {   // 获取title
+	if !hasTitle { // 获取title
 		title = noteService.GetNote(noteId, userId).Title
 	}
-	if !hasContent {   // 获取content
+	if !hasContent { // 获取content
 		content = noteService.GetNoteContent(noteId, userId).Content
 	}
 
-	if oldDir := this.OrganizeImageFiles(userId, title, content); oldDir!="" {
+	if oldDir := this.OrganizeImageFiles(userId, title, content); oldDir != "" {
 		// 删旧文件夹
 		os.RemoveAll(oldDir)
 	}
-	return true	
+	return true
 }

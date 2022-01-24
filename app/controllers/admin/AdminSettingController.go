@@ -1,10 +1,10 @@
 package admin
 
 import (
-	"github.com/revel/revel"
-	. "github.com/leanote/leanote/app/lea"
 	"fmt"
 	"github.com/leanote/leanote/app/info"
+	. "github.com/leanote/leanote/app/lea"
+	"github.com/revel/revel"
 	"strings"
 )
 
@@ -82,20 +82,20 @@ func (c AdminSetting) ExportPdf(path string) revel.Result {
 func (c AdminSetting) DoSiteUrl(siteUrl string) revel.Result {
 	re := info.NewRe()
 	ok1 := configService.UpdateGlobalStringConfig(c.GetUserId(), "siteUrl", siteUrl)
-	ok2 := UpdateConfig("site.url", siteUrl)==nil
-	
+	ok2 := UpdateConfig("site.url", siteUrl) == nil
+
 	switch {
-	case ok1 && ok2 :
+	case ok1 && ok2:
 		re.Msg = "设置已生效，并且重启后也生效"
-	case !ok1 && ok2 :
+	case !ok1 && ok2:
 		re.Msg = "设置未生效，需重启后才生效"
-	case ok1 && !ok2 :
+	case ok1 && !ok2:
 		re.Msg = "设置已生效，重启后失效"
-	case !ok1 && !ok2 :
+	case !ok1 && !ok2:
 		re.Msg = "系统异常，无法修改Site's URL"
 	}
 
-	re.Ok = false  // 强制弹出“提示”
+	re.Ok = false // 强制弹出“提示”
 	return c.RenderJSON(re)
 }
 

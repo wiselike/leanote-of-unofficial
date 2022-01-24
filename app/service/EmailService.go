@@ -1,15 +1,15 @@
 package service
 
 import (
-	"crypto/tls"
-	"net"
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"github.com/leanote/leanote/app/db"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
 	"html/template"
+	"net"
 	"net/smtp"
 	"strconv"
 	"strings"
@@ -45,60 +45,60 @@ func InitEmailFromDb() {
 
 //return a smtp client
 func dial(addr string) (*smtp.Client, error) {
-    conn, err := tls.Dial("tcp", addr, nil)
-    if err != nil {
-        LogW("Dialing Error:", err)
-        return nil, err
-    }
-    //分解主机端口字符串
-    host, _, _ := net.SplitHostPort(addr)
-    return smtp.NewClient(conn, host)
+	conn, err := tls.Dial("tcp", addr, nil)
+	if err != nil {
+		LogW("Dialing Error:", err)
+		return nil, err
+	}
+	//分解主机端口字符串
+	host, _, _ := net.SplitHostPort(addr)
+	return smtp.NewClient(conn, host)
 }
- 
-func SendEmailWithSSL (auth smtp.Auth, to []string, msg []byte) (err error) {
-    //create smtp client
-    c, err := dial(host + ":" + emailPort)
-    if err != nil {
-        LogW("Create smpt client error:", err)
-        return err
-    }
-    defer c.Close()
 
-    if auth != nil {
-        if ok, _ := c.Extension("AUTH"); ok {
-            if err = c.Auth(auth); err != nil {
-                LogW("Error during AUTH", err)
-                return err
-            }
-        }
-    }
- 
-    if err = c.Mail(username); err != nil {
-        return err
-    }
- 
-    for _, addr := range to {
-        if err = c.Rcpt(addr); err != nil {
-            return err
-        }
-    }
- 
-    w, err := c.Data()
-    if err != nil {
-        return err
-    }
- 
-    _, err = w.Write(msg)
-    if err != nil {
-        return err
-    }
- 
-    err = w.Close()
-    if err != nil {
-        return err
-    }
- 
-    return c.Quit()
+func SendEmailWithSSL(auth smtp.Auth, to []string, msg []byte) (err error) {
+	//create smtp client
+	c, err := dial(host + ":" + emailPort)
+	if err != nil {
+		LogW("Create smpt client error:", err)
+		return err
+	}
+	defer c.Close()
+
+	if auth != nil {
+		if ok, _ := c.Extension("AUTH"); ok {
+			if err = c.Auth(auth); err != nil {
+				LogW("Error during AUTH", err)
+				return err
+			}
+		}
+	}
+
+	if err = c.Mail(username); err != nil {
+		return err
+	}
+
+	for _, addr := range to {
+		if err = c.Rcpt(addr); err != nil {
+			return err
+		}
+	}
+
+	w, err := c.Data()
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write(msg)
+	if err != nil {
+		return err
+	}
+
+	err = w.Close()
+	if err != nil {
+		return err
+	}
+
+	return c.Quit()
 }
 
 func (this *EmailService) SendEmail(to, subject, body string) (ok bool, e string) {
@@ -127,7 +127,7 @@ func (this *EmailService) SendEmail(to, subject, body string) (ok bool, e string
 		err = SendEmailWithSSL(auth, send_to, msg)
 	} else {
 		Log("no ssl")
-		err = smtp.SendMail(host + ":" + emailPort, auth, username, send_to, msg)
+		err = smtp.SendMail(host+":"+emailPort, auth, username, send_to, msg)
 	}
 
 	if err != nil {

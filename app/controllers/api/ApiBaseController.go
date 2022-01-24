@@ -4,9 +4,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	//	"encoding/json"
 	"github.com/leanote/leanote/app/controllers"
-	"github.com/leanote/leanote/app/service"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
+	"github.com/leanote/leanote/app/service"
 	"os"
 	"path"
 	//	"fmt"
@@ -156,10 +156,10 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 	filename := handel.Filename
 	_, ext := SplitFilename(filename)
 	switch ext {
-		case "", ".gif", ".jpg", ".png", ".bmp", ".jpeg":
-		default:
-			msg = "notImage"
-			return
+	case "", ".gif", ".jpg", ".png", ".bmp", ".jpeg":
+	default:
+		msg = "notImage"
+		return
 	}
 
 	filename = newGuid + ext

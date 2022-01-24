@@ -4,16 +4,16 @@ import (
 	"github.com/revel/revel"
 	//	"encoding/json"
 	"github.com/leanote/leanote/app/info"
-	"github.com/leanote/leanote/app/service"
 	. "github.com/leanote/leanote/app/lea"
+	"github.com/leanote/leanote/app/service"
 	"gopkg.in/mgo.v2/bson"
 	"os"
 	"os/exec"
 	"path"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
-	"runtime"
 	//	"github.com/leanote/leanote/app/types"
 	//	"io/ioutil"
 	"fmt"
@@ -190,7 +190,7 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 			NoteId:     bson.ObjectIdHex(noteOrContent.NoteId),
 			NotebookId: bson.ObjectIdHex(noteOrContent.NotebookId),
 			Title:      noteOrContent.Title,
-			Src: noteOrContent.Src, // 来源
+			Src:        noteOrContent.Src, // 来源
 			Tags:       strings.Split(noteOrContent.Tags, ","),
 			Desc:       noteOrContent.Desc,
 			ImgSrc:     noteOrContent.ImgSrc,
@@ -202,7 +202,7 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 			IsBlog:   note.IsBlog,
 			Content:  noteOrContent.Content,
 			Abstract: noteOrContent.Abstract}
-		
+
 		noteImageService.OrganizeImageFiles(c.GetUserId(), noteOrContent.Title, noteOrContent.Content)
 
 		note = noteService.AddNoteAndContentForController(note, noteContent, c.GetUserId())
@@ -244,7 +244,7 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 	if c.Has("Content") {
 		//		noteService.UpdateNoteContent(noteOrContent.UserId, c.GetUserId(),
 		//			noteOrContent.NoteId, noteOrContent.Content, noteOrContent.Abstract)
-		// contentOk, contentMsg, afterContentUsn = 
+		// contentOk, contentMsg, afterContentUsn =
 		noteService.UpdateNoteContent(c.GetUserId(),
 			noteOrContent.NoteId, noteOrContent.Content, noteOrContent.Abstract,
 			needUpdateNote, -1, time.Now())

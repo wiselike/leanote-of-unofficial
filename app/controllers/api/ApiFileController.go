@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/revel/revel"
 	"github.com/leanote/leanote/app/service"
+	"github.com/revel/revel"
 	//	"encoding/json"
 	//	. "github.com/leanote/leanote/app/lea"
 	//	"gopkg.in/mgo.v2/bson"
@@ -153,7 +153,7 @@ func (c ApiFile) GetAllAttachs(noteId string) revel.Result {
 		if err != nil {
 			panic(err)
 		}
-		
+
 		fr.Close()
 	}
 
