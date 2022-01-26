@@ -46,14 +46,13 @@
 				
 				<div class="line line-dashed"></div>
 				
-				<p class="text-muted text-center"><small>{{msg . "hasAcount"}}</small></p>
-				
 				{{if .openRegister}}
+				<p class="text-muted text-center"><small>{{msg . "hasAcount"}}</small></p>
 				<a href="/register" class="btn btn-default btn-block">{{msg . "register"}}</a>
-				{{msg . "or"}}
+				<!-- {{msg . "or"}} -->
 				{{end}}
 				
-				<a id="loginBtn" href="/demo" class="btn btn-default btn-block">{{msg . "try"}}</a>
+				<!-- <a id="loginBtn" href="/demo" class="btn btn-default btn-block">{{msg . "try"}}</a> -->
 			</form>	
 		</div>
     </div>
