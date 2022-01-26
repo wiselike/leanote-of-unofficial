@@ -865,7 +865,7 @@ function logout() {
 	LEA.isLogout = true;
 
 	setCookie("LEANOTE_SESSION", '', -1);
-	location.href = UrlPrefix + "/logout?id=1";
+	location.href = "/logout?id=1";
 }
 
 // 得到图片width, height, callback(ret); ret = {width:11, height:33}
