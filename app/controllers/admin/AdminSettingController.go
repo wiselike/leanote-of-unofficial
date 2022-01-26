@@ -58,8 +58,9 @@ func (c AdminSetting) DoDemo(demoUsername, demoPassword string) revel.Result {
 
 	userInfo, err := authService.Login(demoUsername, demoPassword)
 	if err != nil {
-		fmt.Println(err)
-		return c.RenderJSON(info.Re{Ok: false})
+		re.Msg = err.Error()
+		re.Ok = false
+		return c.RenderJSON(re)
 	}
 	if userInfo.UserId == "" {
 		re.Msg = "The User is Not Exists"

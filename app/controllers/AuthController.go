@@ -87,12 +87,12 @@ func (c Auth) Logout() revel.Result {
 
 // 体验一下
 func (c Auth) Demo() revel.Result {
-	email := configService.GetGlobalStringConfig("demoUsername")
-	pwd := configService.GetGlobalStringConfig("demoPassword")
+	email := "forbidden" // configService.GetGlobalStringConfig("demoUsername")
+	pwd := "forbidden"   // configService.GetGlobalStringConfig("demoPassword")
 
 	userInfo, err := authService.Login(email, pwd)
 	if err != nil {
-		return c.RenderJSON(info.Re{Ok: false})
+		return c.RenderJSON(info.Re{Ok: false, Msg: "Demo is forbidden now!"})
 	} else {
 		c.SetSession(userInfo)
 		return c.Redirect("/note")
