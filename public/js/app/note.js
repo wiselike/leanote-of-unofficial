@@ -205,6 +205,7 @@ Note.curHasChanged = function(force, isRefreshOrCtrls) {
 
 	var hasChanged = {
 		hasChanged: false, // 总的是否有改变
+		IsAutoBackup: !force || !!(isRefreshOrCtrls && isRefreshOrCtrls.ctrls), //undefined也能快速转义; 记录是否是自动保存
 		IsNew: cacheNote.IsNew, // 是否是新添加的
 		IsMarkdown: cacheNote.IsMarkdown, // 是否是markdown笔记
 		FromUserId: cacheNote.FromUserId, // 是否是共享新建的
@@ -304,10 +305,7 @@ Note.curHasChanged = function(force, isRefreshOrCtrls) {
 		log("text相同");
 	}
 
-	if (hasChanged.hasChanged) {
-		return hasChanged;
-	}
-	return false;
+	return hasChanged;
 };
 
 // 由content生成desc
@@ -414,51 +412,64 @@ Note.curChangedSaveIt = function(force, callback, isRefreshOrCtrls) {
 		return;
 	}
 	
-	if(hasChanged && hasChanged.hasChanged) {
-		log('需要保存...');
-		// 把已改变的渲染到左边 item-list
-		Note.renderChangedNote(hasChanged);
-		delete hasChanged.hasChanged;
-		
-		// 表示有未完成的保存
-		/*
-		if(me.saveInProcess[hasChanged.NoteId]) {
-			log("in process");
-			me.savePool[hasChanged.NoteId] = hasChanged;
-			me.startUpdatePoolNoteInterval();
-			return;
-		}
-		*/
-		
-		// 保存之
-		showMsg(getMsg("saving"));
-		
+	// 定义发送函数
+	var updateNoteOrContent = function(hasChanged){
 		me.saveInProcess[hasChanged.NoteId] = true;
-		
-		ajaxPost("/note/updateNoteOrContent", hasChanged, function(ret) {
-			me.saveInProcess[hasChanged.NoteId] = false;
-			if(hasChanged.IsNew) {
-				// 缓存之, 后台得到其它信息
-				ret.IsNew = false;
-				Note.setNoteCache(ret, false);
+			ajaxPost("/note/updateNoteOrContent", hasChanged, function(ret) {
+				me.saveInProcess[hasChanged.NoteId] = false;
+				if(hasChanged.IsNew) {
+					// 缓存之, 后台得到其它信息
+					ret.IsNew = false;
+					Note.setNoteCache(ret, false);
 
-				// 新建笔记也要change history
-				Pjax.changeNote(ret);
+					// 新建笔记也要change history
+					Pjax.changeNote(ret);
+				}
+				callback && callback();
+				showMsg(getMsg("saveSuccess"), 1000);
+			});
+	}
+
+	if(hasChanged){
+		if (hasChanged.hasChanged) {
+			log('需要保存...');
+			// 把已改变的渲染到左边 item-list
+			Note.renderChangedNote(hasChanged);
+			delete hasChanged.hasChanged;
+
+			// 表示有未完成的保存
+			/*
+			if(me.saveInProcess[hasChanged.NoteId]) {
+				log("in process");
+				me.savePool[hasChanged.NoteId] = hasChanged;
+				me.startUpdatePoolNoteInterval();
+				return;
 			}
-			callback && callback();
-			showMsg(getMsg("saveSuccess"), 1000);
-		});
-		
-		if(hasChanged['Tags'] != undefined && typeof hasChanged['Tags'] == 'string') {
-			hasChanged['Tags'] = hasChanged['Tags'].split(',');
-		}
-		// 先缓存, 把markdown的preview也缓存起来
-		Note.setNoteCache(hasChanged, false);
-		// 设置更新时间
-		Note.setNoteCache({"NoteId": hasChanged.NoteId, "UpdatedTime": (new Date()).format("yyyy-MM-ddThh:mm:ss.S")}, false);
-		Note.clearCacheByNotebookId(hasChanged.NotebookId);
+			*/
 
-		return hasChanged;
+			// 保存之
+			if (hasChanged.IsAutoBackup){
+				showMsg(getMsg("AutoSaving"));
+			} else {
+				showMsg(getMsg("Saving"));
+			}
+
+			updateNoteOrContent(hasChanged)
+
+			if(hasChanged['Tags'] != undefined && typeof hasChanged['Tags'] == 'string') {
+				hasChanged['Tags'] = hasChanged['Tags'].split(',');
+			}
+			// 先缓存, 把markdown的preview也缓存起来
+			Note.setNoteCache(hasChanged, false);
+			// 设置更新时间
+			Note.setNoteCache({"NoteId": hasChanged.NoteId, "UpdatedTime": (new Date()).format("yyyy-MM-ddThh:mm:ss.S")}, false);
+			Note.clearCacheByNotebookId(hasChanged.NotebookId);
+
+			return hasChanged;
+		} else if (!hasChanged.IsAutoBackup) {	// 强制保存
+			showMsg(getMsg("Saving"));
+			updateNoteOrContent(hasChanged)
+		}
 	}
 	else {
 		log('无需保存');

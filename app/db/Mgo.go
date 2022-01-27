@@ -207,10 +207,10 @@ func UpdateByIdAndUserId(collection *mgo.Collection, id, userId string, i interf
 	return Err(err)
 }
 func UpdateByIdAndUserIdPush(collection *mgo.Collection, id, userId, field string, value interface{}) bool {
-	return UpdateByIdAndUserId(collection, id, userId, bson.M{"$push": bson.M{field: value}})
+	return UpdateByIdAndUserId(collection, id, userId, bson.M{"$push": bson.M{field: value}}) // push in from back
 }
-func UpdateByIdAndUserIdPop(collection *mgo.Collection, id, userId, field string) bool {
-	return UpdateByIdAndUserId(collection, id, userId, bson.M{"$pop": bson.M{field: -1}}) // 第一个
+func UpdateByIdAndUserIdPop(collection *mgo.Collection, id, userId, field string, frontBack int) bool {
+	return UpdateByIdAndUserId(collection, id, userId, bson.M{"$pop": bson.M{field: frontBack}}) // front: -1; back: 1
 }
 func UpdateByIdAndUserId2(collection *mgo.Collection, id, userId bson.ObjectId, i interface{}) bool {
 	err := collection.Update(GetIdAndUserIdBsonQ(id, userId), i)
@@ -222,7 +222,11 @@ func UpdateByIdAndUserIdField(collection *mgo.Collection, id, userId, field stri
 func UpdateByIdAndUserIdMap(collection *mgo.Collection, id, userId string, v bson.M) bool {
 	return UpdateByIdAndUserId(collection, id, userId, bson.M{"$set": v})
 }
-
+func UpdateHistoryBackupState(collection *mgo.Collection, id, userId string, isAutoBackup bool) bool {
+	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id), "UserId": bson.ObjectIdHex(userId), "Histories.IsAutoBackup": true},
+		bson.M{"$set": bson.M{"Histories.$.IsAutoBackup": isAutoBackup}})
+	return Err(err)
+}
 func UpdateByIdAndUserIdField2(collection *mgo.Collection, id, userId bson.ObjectId, field string, value interface{}) bool {
 	return UpdateByIdAndUserId2(collection, id, userId, bson.M{"$set": bson.M{field: value}})
 }
@@ -294,7 +298,9 @@ func Get(collection *mgo.Collection, id string, i interface{}) {
 func Get2(collection *mgo.Collection, id bson.ObjectId, i interface{}) {
 	collection.FindId(id).One(i)
 }
-
+func GetLastOneInArray(collection *mgo.Collection, id, userId, field string, i interface{}) {
+	collection.Find(GetIdAndUserIdQ(id, userId)).Select(bson.M{"Histories": bson.M{"$slice": -1}}).One(i)
+}
 func GetByQ(collection *mgo.Collection, q interface{}, i interface{}) {
 	collection.Find(q).One(i)
 }
