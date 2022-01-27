@@ -44,9 +44,17 @@ func (this *NoteContentHistoryService) AddHistory(noteId, userId string, oneHist
 	if historiesLenth == -1 {
 		this.newHistory(noteId, userId, oneHistory)
 	} else {
-		// 判断是否超出 maxSize, 如果是则pop第一个
+		// 读取最新的历史记录，判断是否是AutoBackup；
+		var lastContentHistory info.NoteContentHistory
+		db.GetLastOneInArray(db.NoteContentHistories, noteId, userId, "Histories", &lastContentHistory)
+		if len(lastContentHistory.Histories) > 0 && lastContentHistory.Histories[0].IsAutoBackup {
+			db.UpdateByIdAndUserIdPop(db.NoteContentHistories, noteId, userId, "Histories", 1)
+			historiesLenth--
+		}
+
+		// 判断是否超出 maxSize, 如果是则pop掉一个最老的
 		if historiesLenth >= maxSize {
-			db.UpdateByIdAndUserIdPop(db.NoteContentHistories, noteId, userId, "Histories")
+			db.UpdateByIdAndUserIdPop(db.NoteContentHistories, noteId, userId, "Histories", -1)
 		}
 
 		// 插入一个历史记录，只能后插
@@ -54,6 +62,14 @@ func (this *NoteContentHistoryService) AddHistory(noteId, userId string, oneHist
 	}
 
 	return
+}
+
+// 更新一下最后一条历史记录的状态，由自动历史转为手动历史
+func (this *NoteContentHistoryService) UpdateHistoryBackupState(noteId, userId string, isAutoBackup bool) {
+	// mongo2没法找到最后数组的最后一个，
+	// 所以这里进行了折中，找到第一个IsAutoBackup为true的项
+	// 将其替换为isAutoBackup值
+	db.UpdateHistoryBackupState(db.NoteContentHistories, noteId, userId, isAutoBackup)
 }
 
 // 新建历史

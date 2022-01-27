@@ -177,7 +177,7 @@ func (c Note) GetNoteContent(noteId string) revel.Result {
 
 // 这里不能用json, 要用post
 func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result {
-	// 新添加note
+	// 新添加note, 不会创建“历史记录”
 	if noteOrContent.IsNew {
 		userId := c.GetObjectUserId()
 		//		myUserId := userId
@@ -247,7 +247,10 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 		// contentOk, contentMsg, afterContentUsn =
 		noteService.UpdateNoteContent(c.GetUserId(),
 			noteOrContent.NoteId, noteOrContent.Content, noteOrContent.Abstract,
-			needUpdateNote, -1, time.Now())
+			needUpdateNote, noteOrContent.IsAutoBackup, -1, time.Now())
+	} else if !noteOrContent.IsAutoBackup {
+		// 更新一下最后一条历史记录的状态（更新为手动历史）
+		noteContentHistoryService.UpdateHistoryBackupState(noteOrContent.NoteId, c.GetUserId(), noteOrContent.IsAutoBackup)
 	}
 
 	if c.Has("Title") || c.Has("Content") {

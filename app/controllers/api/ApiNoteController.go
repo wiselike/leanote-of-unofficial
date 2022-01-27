@@ -509,6 +509,7 @@ func (c ApiNote) UpdateNote(noteOrContent info.ApiNote) revel.Result {
 			noteOrContent.Content,
 			noteOrContent.Abstract,
 			needUpdateNote,
+			false,
 			noteOrContent.Usn,
 			noteOrContent.UpdatedTime)
 	}

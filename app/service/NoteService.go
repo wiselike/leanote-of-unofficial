@@ -588,7 +588,7 @@ func (this *NoteService) UpdateNoteTitle(userId, updatedUserId, noteId, title st
 // hasBeforeUpdateNote 之前是否更新过note其它信息, 如果有更新, usn不用更新
 // TODO abstract这里生成
 func (this *NoteService) UpdateNoteContent(updatedUserId, noteId, content, abstract string,
-	hasBeforeUpdateNote bool,
+	hasBeforeUpdateNote, isAutoBackup bool,
 	usn int, updatedTime time.Time) (bool, string, int) {
 	// 是否已自定义
 	note := this.GetNoteById(noteId)
@@ -631,8 +631,9 @@ func (this *NoteService) UpdateNoteContent(updatedUserId, noteId, content, abstr
 	if db.UpdateByIdAndUserIdMap(db.NoteContents, noteId, userId, data) {
 		// 这里, 添加历史记录
 		noteContentHistoryService.AddHistory(noteId, userId, info.EachHistory{UpdatedUserId: bson.ObjectIdHex(updatedUserId),
-			Content:     content,
-			UpdatedTime: time.Now(),
+			IsAutoBackup: isAutoBackup,
+			Content:      content,
+			UpdatedTime:  time.Now(),
 		})
 
 		// 更新笔记图片
