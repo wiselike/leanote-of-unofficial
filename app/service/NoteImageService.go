@@ -229,8 +229,11 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 		os.Remove(newPathDir)
 		return
 	}
-	if strings.HasPrefix(newPathDir, rmDir+"/") { // 带文件夹结束符，避免比较到部分文件名
-		return "" // 避免把自己给删了
+
+	// 带文件夹结束符，避免比较到部分文件名
+	// 避免删除空标题集合文件夹
+	if strings.HasPrefix(newPathDir, rmDir+"/") || path.Base(rmDir) == "empty-titles-set" {
+		return "" // 不删除
 	}
 	return
 }
