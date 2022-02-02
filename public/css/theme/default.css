@@ -1911,10 +1911,22 @@ textarea#wmd-input {
 #noteItemList.list .item.item-b:hover .item-blog {
   display: block;
 }
+#noteItemList.list .item.item-bt .item-blogtop {
+  display: none;
+}
+#noteItemList.list .item.item-bt:hover .item-blogtop {
+  display: block;
+}
 #noteItemList.list .item-thumb {
   display: none;
 }
 #noteItemList.list .item-blog {
+  display: none;
+  top: auto;
+  bottom: 5px;
+  right: 25px;
+}
+#noteItemList.list .item-blogtop {
   display: none;
   top: auto;
   bottom: 5px;
@@ -2014,12 +2026,31 @@ textarea#wmd-input {
   opacity: 0.5;
   background-color: #464C5E;
 }
+#noteItemList .item-blogtop {
+  position: absolute;
+  right: 1px;
+  font-size: 10px;
+  z-index: 2;
+  padding: 3px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 20px;
+  text-align: center;
+  opacity: 0.5;
+  background-color: #464C5E;
+}
 #noteItemList .item-setting .fa,
 #noteItemList .item-blog .fa {
   color: #fff !important;
 }
+#noteItemList .item-blogtop .fa {
+  color: #fff !important;
+}
 #noteItemList .item-setting:hover,
 #noteItemList .item-blog:hover {
+  opacity: 0.8;
+}
+#noteItemList .item-blogtop:hover {
   opacity: 0.8;
 }
 #noteItemList .item-blog {
@@ -2027,6 +2058,13 @@ textarea#wmd-input {
   display: none;
 }
 #noteItemList .item-b .item-blog {
+  display: block;
+}
+#noteItemList .item-blogtop {
+  top: 1px;
+  display: none;
+}
+#noteItemList .item-bt .item-blogtop {
   display: block;
 }
 #noteItemList .item-setting {
@@ -3020,6 +3058,11 @@ h3 {
     width: 30px;
     display: inline-block;
   }
+  #noteItemList .item-blogtop {
+    font-size: 16px;
+    width: 30px;
+    display: inline-block;
+  }
   #noteMaskForLoading {
     opacity: 0.8;
   }
@@ -3274,6 +3317,9 @@ h3 {
   .leanote-plugin #noteItemList .item-blog {
     font-size: 14px;
   }
+  .leanote-plugin #noteItemList .item-blogtop {
+    font-size: 14px;
+  }
   .leanote-plugin .leanoteNav h1 {
     font-size: 16px;
   }
@@ -3291,6 +3337,10 @@ h3 {
   }
   .leanote-plugin #noteItemList .item-setting,
   .leanote-plugin #noteItemList .item-blog {
+    width: 23px;
+    padding: 1px;
+  }
+  .leanote-plugin #noteItemList .item-blogtop {
     width: 23px;
     padding: 1px;
   }

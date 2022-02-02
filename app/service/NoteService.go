@@ -660,9 +660,6 @@ func (this *NoteService) UpdateTags(noteId string, userId string, tags []string)
 
 func (this *NoteService) ToBlog(userId, noteId string, isBlog, isTop bool) bool {
 	noteUpdate := bson.M{}
-	if isTop {
-		isBlog = true
-	}
 	if !isBlog {
 		isTop = false
 	}

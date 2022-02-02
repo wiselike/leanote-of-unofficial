@@ -11,7 +11,7 @@ Note.curNoteId = '';
 
 Note.interval = ""; // 定时器
 
-Note.itemIsBlog = '<div class="item-blog"><i class="fa fa-bold" title="blog"></i></div><div class="item-setting"><i class="fa fa-cog" title="setting"></i></div>';
+Note.itemIsBlog = '<div class="item-blog"><i class="fa fa-bold" title="blog"></i></div><div class="item-blogtop"><i class="fa fa-arrow-up" title="blogtop"></i></div><div class="item-setting"><i class="fa fa-cog" title="setting"></i></div>';
 // for render
 Note.itemTplNoImg = '<li href="#" class="item ?" data-seq="?" noteId="?">'
 Note.itemTplNoImg += Note.itemIsBlog +'<div class="item-desc"><p class="item-title">?</p><p class="item-info"><i class="fa fa-book"></i> <span class="note-notebook">?</span> <i class="fa fa-clock-o"></i> <span class="updated-time">?</span></p><p class="desc">?</p></div></li>';
@@ -33,7 +33,7 @@ Note.notebookIds = {}; // notebookId => true
 
 Note.isReadOnly = false;
 // 定时保存信息
-Note.intervalTime = 600 * 000; // 600s, 10mins
+//Note.intervalTime = 600 * 1000; // 600s, 10mins, 调试用; 正式环境用下面的值
 Note.intervalTime = 10 * 1000; // 10s
 Note.startInterval = function() {
 	clearInterval(Note.interval);
@@ -1077,10 +1077,16 @@ Note._renderNotes = function(notes, forNewNote, isShared, tang) { // 第几趟
 			tmp = tt(Note.itemTplNoImg, classes, i, note.NoteId, note.Title, Notebook.getNotebookTitle(note.NotebookId), goNowToDatetime(note.UpdatedTime), note.Desc);
 		}
 		tmp = $(tmp);
-		if(!note.IsBlog) {
+		if(note.IsTop) {
 			tmp.removeClass('item-b');
+			tmp.addClass('item-bt');
 		} else {
-			tmp.addClass('item-b');
+			tmp.removeClass('item-bt');
+			if(!note.IsBlog) {
+				tmp.removeClass('item-b');
+			} else {
+				tmp.addClass('item-b');
+			}
 		}
 		Note.noteItemListO.append(tmp);
 		
@@ -1168,11 +1174,16 @@ Note.newNote = function(notebookId, isShare, fromUserId, isMarkdown) {
 	
 	// notebook是否是Blog
 	newItem = $(newItem);
-	if(!notebook.IsBlog) {
+	if(notebook.IsTop) {
 		newItem.removeClass('item-b');
-	}
-	else {
-		newItem.addClass('item-b');
+		newItem.addClass('item-bt');
+	} else {
+		newItem.removeClass('item-bt');
+		if(!notebook.IsBlog) {
+			newItem.removeClass('item-b');
+		} else {
+			newItem.addClass('item-b');
+		}
 	}
 	
 	// 是否在当前notebook下, 不是则切换过去, 并得到该notebook下所有的notes, 追加到后面!
@@ -1495,12 +1506,12 @@ Note.getTargetById = function(noteId) {
 //----------
 //设为blog/unset
 Note.setNote2Blog = function(target) {
-	Note._setBlog(target, true);
+	Note._setBlog(target, true, false);
 };
 Note.unsetNote2Blog = function(target) {
-	Note._setBlog(target, false);
+	Note._setBlog(target, false, false);
 };
-Note._setBlog = function(target, isBlog) {
+Note._setBlog = function(target, isBlog, isTop) {
 	var me = Note;
 	// 批量操作
 	var noteIds;
@@ -1510,20 +1521,35 @@ Note._setBlog = function(target, isBlog) {
 	else {
 		noteIds = [$(target).attr("noteId")];
 	}
-	ajaxPost("/note/setNote2Blog", {noteIds: noteIds, isBlog: isBlog}, function(ret) {
+	ajaxPost("/note/setNote2Blog", {noteIds: noteIds, isBlog: isBlog, isTop: isTop}, function(ret) {
 		if(ret) {
 			for (var i = 0; i < noteIds.length; ++i) {
 				var noteId = noteIds[i];
 				var $t = me.getTargetById(noteId);
-				if(isBlog) {
-					$t.addClass('item-b');
-				} else {
+				if(isTop) {
 					$t.removeClass('item-b');
+					$t.addClass('item-bt');
+				} else {
+					$t.removeClass('item-bt');
+					if(isBlog) {
+						$t.addClass('item-b');
+					} else {
+						$t.removeClass('item-b');
+					}
 				}
-				me.setNoteCache({NoteId: noteId, IsBlog: isBlog}, false); // 不清空NotesByNotebookId缓存
+				me.setNoteCache({NoteId: noteId, IsBlog: isBlog, IsTop: isTop}, false); // 不清空NotesByNotebookId缓存
 			}
 		}
 	});
+};
+
+//----------
+//设为blog top
+Note.setBlogTop = function(target) {
+	Note._setBlog(target, true, true);
+};
+Note.unsetBlogTop = function(target) {
+	Note._setBlog(target, true, false);
 };
 
 // 设置notebook的blog状态
@@ -1874,6 +1900,8 @@ Note.initContextmenu = function() {
 			{ type: "splitLine" },
 			{ text: getMsg("publicAsBlog"), alias: 'set2Blog', faIcon: "fa-bold", action: Note.setNote2Blog },
 			{ text: getMsg("cancelPublic"), alias: 'unset2Blog', faIcon: "fa-undo", action: Note.unsetNote2Blog },
+			{ text: getMsg("setBlogTop"), alias: 'setBlogTop', faIcon: "fa-arrow-up", action: Note.setBlogTop },
+			{ text: getMsg("cancelBlogTop"), alias: 'cancelBlogTop', faIcon: "fa-minus", action: Note.unsetBlogTop },
 			{ type: "splitLine" },
 			// { text: "分享到社区", alias: 'html2Image', icon: "", action: Note.html2Image},
 			{ text: getMsg("exportPdf"), alias: 'exportPDF', faIcon: "fa-file-pdf-o", action: Note.exportPDF},
@@ -1942,6 +1970,18 @@ Note.initContextmenu = function() {
 			}
 		}
 		// console.log(items);
+
+		// 开启博客后，启用置顶功能
+		if(items.indexOf("set2Blog")!=-1 && items.indexOf("unset2Blog")==-1) {
+			if(note.IsTop) {
+				items.push("setBlogTop")
+			} else {
+				items.push("cancelBlogTop")
+			}
+		} else { // 其他情况，禁用置顶功能
+			items.push("setBlogTop")
+			items.push("cancelBlogTop")
+		}
 
 		// diable 这里
         menu.applyrule({
