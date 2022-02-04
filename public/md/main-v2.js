@@ -17233,6 +17233,29 @@ define('core', [
         return converter;
     }
 
+	/**
+	 * 统计字数（中文按单字算，英文按单词算)
+	 */
+	 function calcWords(str) {
+		sLen = 0;
+		try{
+			str = str.replace(/<[^>]+>/g,"");        //过滤所有的HTML标签
+			//先将回车换行符做特殊处理
+			str = str.replace(/(\r\n+|\s+|　+)/g,"龘");
+			//处理英文字符数字，连续字母、数字、英文符号视为一个单词
+			str = str.replace(/[\x00-\xff]/g,"m");
+			//合并字符m，连续字母、数字、英文符号视为一个单词
+			str = str.replace(/m+/g,"*");
+			//去掉回车换行符
+			str = str.replace(/龘+/g,"");
+			//返回字数
+			sLen = str.length;
+		}catch(e){
+		}
+		str = ""
+		return sLen;
+	}
+
     // 初始化
     core.initEditor = function (fileDescParam) {
         if (fileDesc !== undefined) {
@@ -17254,19 +17277,21 @@ define('core', [
             $editorElt.val(initDocumentContent);
         }
 
-        aceEditor.getSession().on('change', function () {
-            content = getEditorContent(true)[0];
-            // msg = '字符数：' + content.length + ' 字数：' + calcWords(content);
-            msg = '字数：' + calcWords(content);
-            console.log(msg);
-            fmsg = '<div id="calcWords" tabindex="-1">' + msg + '</div>';
-            i = $('#wmd-button-bar').find('#calcWords');
-            if (i.length == 0) {
-                $('#wmd-button-bar').append(fmsg);
-            } else {
-                $(i[0]).html(msg).css({ "float": "right", "padding-right": "10px" });
-            }
-        });
+		// 移动端存在aceEditor未初始化，始终不能显示字数；而且移动端显示不下了，就不显了：）
+		if (aceEditor !== undefined) {
+			aceEditor.getSession().on('change', function () {
+				content = getEditorContent(true)[0];
+				msg = '字数：' + calcWords(content);
+				fmsg = '<div id="calcWords" tabindex="-1">' + msg + '</div>';
+				i = $('#wmd-button-bar').find('#calcWords');
+				if (i.length == 0) {
+					$('#wmd-button-bar').prepend(fmsg);
+				} else {
+					// 字符高度与“info-toolbar”的css定义高度保持一致
+					$(i[0]).html(msg).css({ "float": "right", "padding-right": "10px", "line-height": "30px", "height": "30px"});
+				}
+			});
+		}
 
         // If the editor is already created
         if (editor !== undefined) {
