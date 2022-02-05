@@ -3053,16 +3053,6 @@ h3 {
     height: 118px;
   }
   #noteItemList .item-setting,
-  #noteItemList .item-blog {
-    font-size: 16px;
-    width: 30px;
-    display: inline-block;
-  }
-  #noteItemList .item-blogtop {
-    font-size: 16px;
-    width: 30px;
-    display: inline-block;
-  }
   #noteMaskForLoading {
     opacity: 0.8;
   }
