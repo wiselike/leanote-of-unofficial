@@ -114,7 +114,7 @@ gulp.task('concatMarkdownJs', function() {
 gulp.task('concatMarkdownJsV2', function() {
     var jss = [
         'js/require.js',
-        'md/main-v2.min.js',
+        'md/main-v2.js',
     ];
 
     for(var i in jss) {
@@ -330,6 +330,7 @@ gulp.task('concatAlbumJs', function() {
 
 // tinymce
 // please set the right path on your own env
+/*
 var tinymceBase = '/Users/life/leanote/leanote-tools/tinymce_4.1.9_leanote_public';
 gulp.task('tinymce', function() {
     // 先清理
@@ -353,6 +354,7 @@ gulp.task('tinymce', function() {
         });
     });
 });
+*/
 
 // 合并css, 无用
 // Deprecated

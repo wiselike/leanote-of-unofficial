@@ -9,6 +9,7 @@
 <meta name="keywords" content="leanote,leanote.com,蚂蚁笔记">
 <meta name="description" content="Leanote, 蚂蚁笔记, {{msg $ "moto"}}">
 <title>Leanote, {{msg $ "moto"}}</title>
+
 <link href="/css/bootstrap-min.css" rel="stylesheet" />
 <!-- 先加载, 没有样式, 宽度不定 -->
 <link rel="stylesheet" href="/css/tinymce/skin.min.css" rel="stylesheet"/>
@@ -20,6 +21,7 @@
 <!-- context-menu -->
 <link rel="stylesheet" href="/js/contextmenu/css/contextmenu-min.css?id=1" type="text/css" />
 <link href="/css/blog/emoji.css" rel="stylesheet">
+
 <script>
 var hash = location.hash;
 if(hash.indexOf("writing") >= 0) {
@@ -29,6 +31,8 @@ if(hash.indexOf("writing") >= 0) {
 }
 document.write(files);
 </script>
+
+
 <!-- For Develop writting mod -->
 <script>
 function log(o) {
@@ -39,9 +43,11 @@ function log(o) {
 <body class="leanote-plugin lang-{{$.locale}}">
 	<div id="page">
 		<div id="pageInner">
+
 			<!-- 头部 -->
 			<!-- <div id="headerContainer"> -->
 			<div id="header">
+
 				<a id="logo" href="/" title="Leanote {{msg . "home"}}" class="pull-left"></a>
 				<div id="switcher" class="pull-left">
 					 <i class="fa fa-dedent" id="leftSwitcher" title="{{msg . "leftHidden"}}"></i>
@@ -53,6 +59,7 @@ function log(o) {
 						<input class="form-control" placeholder="{{msg . "SearchNote"}}" type="text" id="searchNoteInput">
 					</form>
 				</div>
+
 				<!-- 全局按钮 -->
 				<div class="pull-left" style="" id="newNoteWrap">
 					<!-- 新建笔记 -->
@@ -70,6 +77,7 @@ function log(o) {
 						</a>
 						<span class="for-split"> - </span>
 						<span id="curNotebookForNewNote" notebookId=""></span>
+
 						<!--
 						<div class="dropdown" style="display: inline-block">
 							<a class="ios7-a dropdown-toggle"
@@ -83,6 +91,7 @@ function log(o) {
 							</div>
 						</div>
 						-->
+
 					</div>
 					
 					<!-- 只为新建别人的笔记 -->
@@ -99,6 +108,7 @@ function log(o) {
 						</a>
 						<span class="for-split"> - </span>
 						<span id="curNotebookForNewSharedNote" notebookId="" userId=""></span>
+
 						<!--
 						<div class="dropdown" style="display: inline-block">
 							<a id="listShareNotebookDropdownMenu" class="ios7-a dropdown-toggle" data-toggle="dropdown"> 
@@ -179,6 +189,7 @@ function log(o) {
 						</ul>
 					</div>
 				</div>
+
 				<div class="pull-right top-nav writting-hide lea-blog">
 					<a target="_blank" href="http://lea.leanote.com"> 
 						{{msg . "Explore"}}
@@ -190,6 +201,7 @@ function log(o) {
 						{{msg . "myBlog"}}
 					</a>
 				</div>
+
 				<div class="pull-right toggle-editor-mode top-nav" id="toggleEditorMode">
 					<a href="#writing"><span>{{msg . "writingMode"}}</span></a>
 				</div>
@@ -217,6 +229,7 @@ function log(o) {
 							<li><a href="#"> d@c.com 共享了笔记给你 是否接受? </a></li>
 						</ul>
 					</li>
+
 					<li class="dropdown settings">
 						<a class="dropdown-toggle" data-toggle="dropdown"> 
 							<span aria-hidden="true" class="icon se7en-gear"></span>
@@ -236,6 +249,7 @@ function log(o) {
 				-->
 				<div style="clear: both"></div>
 			</div>
+
 			<div id="mainContainer" class="clearfix">
 				<div id="mainMask">
 					<img src="/images/loading-30.gif" />
@@ -321,6 +335,7 @@ function log(o) {
 					</div>
 					-->
 				</div>
+
 				<div class="noteSplit" id="notebookSplitter"></div>
 				
 				<div id="noteAndEditor">
@@ -331,6 +346,7 @@ function log(o) {
 					</div>
 					<div id="noteList">
 					<div class="clearfix" id="notesAndSort" style="position: relative">
+
 						<div class="pull-left">
 							<!-- 我的笔记本 -->
 							<div class="dropdown" id="myNotebookNavForListNav">
@@ -346,8 +362,10 @@ function log(o) {
 								</a>
 							</div>
 						</div>
+
 						<!-- tag search -->
 						<div class="pull-left" id="tagSearch"></div>
+
 						<!-- sort type -->
 						<div id="sortType">
 							<div class="dropdown">
@@ -358,6 +376,7 @@ function log(o) {
 								<ul class="dropdown-menu" role="menu"
 									aria-labelledby="dropdownMenu1"
 									>
+
 									<li role="presentation"><a data-view="snippet" class="view-style view-snippet" role="menuitem">
 										<i class="fa fa-check"></i>
 										{{leaMsg . "Snippet View"}}
@@ -398,6 +417,7 @@ function log(o) {
 							</div>
 						</div>
 					</div>
+
 					<!-- 笔记列表 -->
 					<!-- wrap 为了slimScroll -->
 					<div id="noteItemListWrap">
@@ -431,6 +451,7 @@ function log(o) {
 							{{msg . "canntNewNoteTips"}}
 						</div>
 					</div>
+
 					<div id="batchMask" class="note-mask"> <!-- z-index: 99 --> 
 						<div class="batch-ctn" id="batchCtn"></div>
 						<div class="batch-info">
@@ -439,6 +460,7 @@ function log(o) {
 						</div>
 					</div>
 					
+
 					<div id="noteTop">
 						<!-- 左侧放tag, 右侧放按钮, 比如save, info, move, delete -->
 						<div id="tool" class="clearfix">
@@ -453,6 +475,7 @@ function log(o) {
 							<div class="pull-left" id="tag">
 								<div id="tags" style="display: inline-block; line-height: 25px;">
 								</div>
+
 								<div class="dropdown" style="display: inline-block"
 									id="tagDropdown">
 									<i class="fa fa-bookmark-o"></i> 
@@ -479,15 +502,18 @@ function log(o) {
 								<li><a class="ios7-a " id="editBtn"
 									data-toggle="dropdown" title="ctrl/cmd+e {{leaMsg . "Toggle Modify with Readonly"}}">
 									<span class="fa"></span></a></li>
+
 								<li><a class="ios7-a " id="saveBtn"
 									data-toggle="dropdown" title="ctrl/cmd+s {{msg . "save"}}">
 									<span class="fa fa-save"></span></a></li>
+
 								<li class="dropdown" id="noteInfoDropdown">
 									<a class="ios7-a dropdown-toggle" data-toggle="dropdown" title="{{msg . "Information"}}">
 										<span class="fa fa-info"></span>
 									</a>
 									<div class="dropdown-menu" id="noteInfo"></div>
 								</li>
+
 								<li class="dropdown" id="attachDropdown">
 									<a class="ios7-a dropdown-toggle" data-toggle="dropdown" id="showAttach" title="{{msg . "attachments"}}">
 										<span class="fa fa-paperclip"></span>
@@ -523,6 +549,7 @@ function log(o) {
 									<span class="fa fa-question"></span></a></li>
 							</ul>
 						</div>
+
 						<div id="noteTitleDiv">
 							<input name="noteTitle" id="noteTitle" value="" placeholder="{{msg . "unTitled"}}" tabindex="1" />
 						</div>
@@ -544,6 +571,7 @@ function log(o) {
 							</div>
 						</div>
 					</div>
+
 					<div id="editor" class="read-only">
 						<!-- 编辑器 -->
 						<div id="mceToolbar">
@@ -720,6 +748,7 @@ function log(o) {
 				        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 				        <h4 class="modal-title" id="editorDialog-title"></h4>
 				      </div>
+
 				      <div class="modal-body">
 							<p></p>
 							<div class="input-group">
@@ -837,6 +866,7 @@ function log(o) {
 		</div>
 	</div>
 </div>
+
 <script>
 var LEA = {sPath: ''};
 LEA.locale = "{{.locale}}";
@@ -856,11 +886,22 @@ var tagsJson = {{.tags|jsonJs}};
 var GlobalConfigs = {{.globalConfigs|jsonJs}};
 var tinyMCEPreInit = {base: '/public/tinymce', suffix: '.min'};
 </script>
+
 <script src="/js/i18n/msg.{{.locale}}.js"></script>
+
 <script src="/js/dep.min.js"></script>
+
+
+
 <script src="/tinymce/tinymce.full.min.js"></script>
+
 <script src="/public/libs/ace/ace.js"></script>
+
+
+
 <script src="/js/app.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/mermaid/8.11.2/mermaid.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/3.5.0/chart.min.js"></script>
 <script>
 initPage();
 // 当tinymce.dev.js时, 请注释require
@@ -868,12 +909,11 @@ window.require = {
     baseUrl: '/public',
 };
 </script>
-<script src="https://cdn.bootcdn.net/ajax/libs/mermaid/8.11.2/mermaid.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/Chart.js/3.5.0/chart.min.js"></script>
-<script src="/js/require.js"></script>
-<script src="/public/md/main-v2.js"></script>
 
-<!-- <script src="/js/markdown-v2.min.js"></script> -->
+<script src="/js/markdown-v2.min.js"></script>
+
+
+
 <script src="/public/js/plugins/main.min.js"></script>
 </body>
 </html>

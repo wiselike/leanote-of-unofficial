@@ -18,5 +18,8 @@
   "license": "GPL v2",
   "bugs": {
     "url": "https://github.com/leanote/leanote/issues"
+  },
+  "dependencies": {
+    "gulp-minify-css": "^1.2.4"
   }
 }

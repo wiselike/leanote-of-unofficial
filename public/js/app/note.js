@@ -449,9 +449,9 @@ Note.curChangedSaveIt = function(force, callback, isRefreshOrCtrls) {
 
 			// 保存之
 			if (hasChanged.IsAutoBackup){
-				showMsg(getMsg("AutoSaving"));
+				showMsg(getMsg("autoSaving"));
 			} else {
-				showMsg(getMsg("Saving"));
+				showMsg(getMsg("saving"));
 			}
 
 			updateNoteOrContent(hasChanged)
@@ -467,7 +467,7 @@ Note.curChangedSaveIt = function(force, callback, isRefreshOrCtrls) {
 
 			return hasChanged;
 		} else if (!hasChanged.IsAutoBackup) {	// 强制保存
-			showMsg(getMsg("Saving"));
+			showMsg(getMsg("saving"));
 			updateNoteOrContent(hasChanged)
 		}
 	}
