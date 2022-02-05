@@ -5,7 +5,7 @@ import (
 	. "github.com/leanote/leanote/app/lea"
 	"github.com/revel/revel"
 	"strings"
-	//	"strconv"
+	"time"
 )
 
 // 用户登录/注销/找回密码
@@ -63,17 +63,22 @@ func (c Auth) DoLogin(email, pwd string, captcha string) revel.Result {
 		msg = "captchaError"
 	} else {
 		userInfo, err := authService.Login(email, pwd)
-		if err != nil {
-			// 登录错误, 则错误次数++
-			msg = "wrongUsernameOrPassword"
-			sessionService.IncrLoginTimes(sessionId)
-		} else {
+		if err == nil {
 			c.SetSession(userInfo)
 			sessionService.ClearLoginTimes(sessionId)
 			return c.RenderJSON(info.Re{Ok: true})
 		}
+		// 登录错误, 则错误次数++
+		msg = "wrongUsernameOrPassword"
+		sessionService.IncrLoginTimes(sessionId)
+		// 必需要让前端再请求新验证码，避免密码猜测攻击
+		sessionService.SetCaptcha(sessionId, Md5("wiselikeMagicToken"+sessionId))
 	}
 
+	if sessionService.LoginTimesIsOver(sessionId) {
+		// 重试太多次了，休息一下
+		time.Sleep(time.Second * 2)
+	}
 	return c.RenderJSON(info.Re{Ok: false, Item: sessionService.LoginTimesIsOver(sessionId), Msg: c.Message(msg)})
 }
 

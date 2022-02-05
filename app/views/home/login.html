@@ -3,7 +3,7 @@
 <!-- 验证码 -->
 <script type="text/x-jsrender" id="tCaptcha">
 	<div class="form-group"> 
-		<label class="control-label">{{rawMsg . "captcha"}}</label>
+		<label class="control-label">{{msg . "captcha"}}</label>
 	    <input type="text" class="form-control" id="captcha" name="captcha">
 	    <a id="reloadCaptcha" title="{{msg . "reloadCaptcha"}}" onclick="$('#captchaImage').attr('src', '/captcha/get?' + ((new Date()).getTime()))"><img src="/captcha/get" id="captchaImage"/></a>
 	</div>
@@ -124,9 +124,13 @@ $(function() {
 				var from = $("#from").val() || "{{.noteUrl}}" || "/note";
 				location.href = from;
 			} else {
-				if(e.Item && $.trim($("#captchaContainer").text()) == "") {
-					$("#captchaContainer").html($("#tCaptcha").html());
-					needCaptcha = true
+				if(e.Item) {
+					if($.trim($("#captchaContainer").text()) == "") {
+						$("#captchaContainer").html($("#tCaptcha").html());
+						needCaptcha = true
+					} else {
+						$('#captchaImage').attr('src', '/captcha/get?' + ((new Date()).getTime()))
+					}
 				}
 				
 				showMsg(e.Msg);
