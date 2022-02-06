@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
+	"github.com/leanote/leanote/app/service"
 	"github.com/revel/revel"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"time"
 	//	"github.com/leanote/leanote/app/lea/blog"
@@ -400,7 +402,7 @@ func (c MemberBlog) uploadImage(themeId string) (re info.Re) {
 		LogJ(err)
 		return re
 	}
-	TransToGif(toPath, 0, true)
+	TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins"))
 	resultCode = 1
 	resultMsg = "上传成功!"
 

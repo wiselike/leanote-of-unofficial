@@ -1,5 +1,12 @@
 package lea
 
+import (
+	"os"
+	"path"
+	"fmt"
+	"time"
+)
+
 /*
 import (
 	"github.com/Terry-Mao/paint"
@@ -107,6 +114,23 @@ func Reset(path string, maxWidth uint) (ok bool, transPath string){
 }
 */
 
-func TransToGif(path string, maxWidth uint, afterDelete bool) (ok bool, transPath string) {
-	return ok, path
+// 计划在这里做图片压缩、大小适配工作；
+// 因为是自己的笔记服务，肯定不能把原图丢弃了，
+// 这里统一把原图先备份到一个目录下
+// 以后再区分用户名
+// 文件名就按时间来排序吧
+func TransPicture(inPath, backupDir string) (ok bool, transPath string) {
+	transPath = inPath
+
+	err := os.MkdirAll(backupDir, 0755)
+	if err != nil {
+		return
+	}
+
+	destPath := path.Join(backupDir, fmt.Sprintf(time.Now().Format("2006年01月02日 15点04分05秒_%s"), path.Base(inPath)))
+	if _, err = CopyFile(inPath, destPath); err == nil {
+		ok = true
+	}
+
+	return
 }

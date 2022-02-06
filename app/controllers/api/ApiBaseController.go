@@ -185,7 +185,7 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 		return
 	}
 	// 改变成gif图片
-	_, toPathGif := TransToGif(toPath, 0, true)
+	_, toPathGif := TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins"))
 	filename = GetFilename(toPathGif)
 	filesize := GetFilesize(toPathGif)
 
