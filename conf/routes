@@ -13,7 +13,7 @@ GET     /index   	                                Index.Index
 GET     /login                                     	Auth.Login
 POST     /doLogin                                   Auth.DoLogin
 GET     /logout                                     Auth.Logout
-Get     /demo                                   	Auth.Demo
+# Get     /demo                                   	Auth.Demo
 
 Get 	 /register									Auth.Register
 POST     /doRegister                                Auth.DoRegister
@@ -86,33 +86,33 @@ GET		/blog						Blog.Index
 GET		/blog/*						Blog.E()
 
 #---------------
-# preview
-GET		/preview/tags/:userIdOrEmail	Preview.Tags
-GET		/preview/tags	Preview.Tags
-
-GET		/preview/tag/:userIdOrEmail/:tag	Preview.Tag
-GET		/preview/tag/:tag	Preview.Tag
-
-GET		/preview/search/:userIdOrEmail	Preview.Search
-GET		/preview/search	Preview.Search
-
-GET		/preview/archives/:userIdOrEmail	Preview.Archives
-GET		/preview/archives	Preview.Archives
-
-GET		/preview/view/:noteId			Preview.Post
-
-GET		/preview/post/:noteId			Preview.Post
-GET		/preview/post/:userIdOrEmail/:noteId			Preview.Post
-
-GET		/preview/single/:userIdOrEmail/:singleId			Preview.Single
-GET		/preview/single/:singleId			Preview.Single
-
-GET		/preview/cates/:userIdOrEmail   Preview.Cates
-GET		/preview/cate/:notebookId		Preview.Cate
-GET		/preview/cate/:userIdOrEmail/:notebookId		Preview.Cate
-
-GET		/preview/:userIdOrEmail		Preview.Index
-GET		/preview						Preview.Index
+# preview(DISABLED ALL)
+#GET		/preview/tags/:userIdOrEmail	Preview.Tags
+#GET		/preview/tags	Preview.Tags
+#
+#GET		/preview/tag/:userIdOrEmail/:tag	Preview.Tag
+#GET		/preview/tag/:tag	Preview.Tag
+#
+#GET		/preview/search/:userIdOrEmail	Preview.Search
+#GET		/preview/search	Preview.Search
+#
+#GET		/preview/archives/:userIdOrEmail	Preview.Archives
+#GET		/preview/archives	Preview.Archives
+#
+#GET		/preview/view/:noteId			Preview.Post
+#
+#GET		/preview/post/:noteId			Preview.Post
+#GET		/preview/post/:userIdOrEmail/:noteId			Preview.Post
+#
+#GET		/preview/single/:userIdOrEmail/:singleId			Preview.Single
+#GET		/preview/single/:singleId			Preview.Single
+#
+#GET		/preview/cates/:userIdOrEmail   Preview.Cates
+#GET		/preview/cate/:notebookId		Preview.Cate
+#GET		/preview/cate/:userIdOrEmail/:notebookId		Preview.Cate
+#
+#GET		/preview/:userIdOrEmail		Preview.Index
+#GET		/preview						Preview.Index
 
 # Map static resources from the /app/public folder to the /public path
 GET     /favicon.ico                            Static.Serve("public/images/favicon.ico")
