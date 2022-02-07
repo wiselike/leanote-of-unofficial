@@ -208,16 +208,18 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 				fname := strings.Split(path.Base(file.Path), "_")
 				file.Path = path.Join(newDbPathDir, fmt.Sprintf("%d_%s", i, fname[len(fname)-1]))
 				newFullPath := path.Join(basePath, file.Path)
-				if err := os.Rename(oldFullPath, newFullPath); err == nil {
-					// 更新数据库
-					if ok := db.UpdateByIdAndUserId(db.Files, each[2], userId, file); !ok {
-						// 数据库写失败，回滚
-						os.Rename(newFullPath, oldFullPath)
-						continue
-					}
-					// 保存第一张图片的文件夹，作为旧路径，用于删除
-					if rmDir == "" {
-						rmDir = path.Dir(oldFullPath)
+				if oldFullPath != newFullPath {
+					if err := os.Rename(oldFullPath, newFullPath); err == nil {
+						// 更新数据库
+						if ok := db.UpdateByIdAndUserId(db.Files, each[2], userId, file); !ok {
+							// 数据库写失败，回滚
+							os.Rename(newFullPath, oldFullPath)
+							continue
+						}
+						// 保存第一张图片的文件夹，作为旧路径，用于删除
+						if rmDir == "" {
+							rmDir = path.Dir(oldFullPath)
+						}
 					}
 				}
 			}
@@ -232,7 +234,7 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 
 	// 带文件夹结束符，避免比较到部分文件名
 	// 避免删除空标题集合文件夹
-	if strings.HasPrefix(newPathDir, rmDir+"/") || path.Base(rmDir) == "empty-titles-set" {
+	if strings.HasPrefix(newPathDir+"/", rmDir+"/") || path.Base(rmDir) == "empty-titles-set" {
 		return "" // 不删除
 	}
 	return
