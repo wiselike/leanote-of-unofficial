@@ -24,6 +24,7 @@ func (c Auth) Login(email, from string) revel.Result {
 	c.ViewArgs["openRegister"] = configService.IsOpenRegister()
 
 	sessionId := c.Session.ID()
+	defer sessionService.Update(sessionId, "LastClientIP", c.ClientIP)
 	if sessionService.LoginTimesIsOver(sessionId) {
 		c.ViewArgs["needCaptcha"] = true
 	}
@@ -40,6 +41,7 @@ func (c Auth) Login(email, from string) revel.Result {
 // 为了demo和register
 func (c Auth) doLogin(email, pwd string) revel.Result {
 	sessionId := c.Session.ID()
+	defer sessionService.Update(sessionId, "LastClientIP", c.ClientIP)
 	var msg = ""
 
 	userInfo, err := authService.Login(email, pwd)
@@ -56,6 +58,7 @@ func (c Auth) doLogin(email, pwd string) revel.Result {
 }
 func (c Auth) DoLogin(email, pwd string, captcha string) revel.Result {
 	sessionId := c.Session.ID()
+	defer sessionService.Update(sessionId, "LastClientIP", c.ClientIP)
 	var msg = ""
 
 	// > 5次需要验证码, 直到登录成功

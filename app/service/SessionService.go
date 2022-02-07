@@ -31,6 +31,7 @@ func (this *SessionService) Get(sessionId string) info.Session {
 		session.Id = bson.NewObjectId()
 		session.SessionId = sessionId
 		session.CreatedTime = time.Now()
+		session.LoginTimes = 1
 		session.UpdatedTime = session.CreatedTime
 		db.Insert(db.Sessions, session)
 	}
