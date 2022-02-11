@@ -17,11 +17,9 @@ type PwdService struct {
 // 1. 找回密码, 通过email找用户,
 // 用户存在, 生成code
 func (this *PwdService) FindPwd(email string) (ok bool, msg string) {
-	ok = false
 	userId := userService.GetUserId(email)
 	if userId == "" {
-		msg = "用户不存在"
-		return
+		return false, "用户不存在"
 	}
 
 	token := tokenService.NewToken(userId, email, info.TokenPwd)
@@ -30,8 +28,7 @@ func (this *PwdService) FindPwd(email string) (ok bool, msg string) {
 	}
 
 	// 发送邮件
-	ok, msg = emailService.FindPwdSendEmail(token, email)
-	return
+	return emailService.FindPwdSendEmail(token, email)
 }
 
 // 重置密码时

@@ -63,7 +63,7 @@ func SendEmailWithSSL(auth smtp.Auth, to []string, msg []byte) (err error) {
 		LogW("Create smpt client error:", err)
 		return err
 	}
-	defer c.Close()
+	defer c.Quit()
 
 	if auth != nil {
 		if ok, _ := c.Extension("AUTH"); ok {
@@ -88,18 +88,14 @@ func SendEmailWithSSL(auth smtp.Auth, to []string, msg []byte) (err error) {
 	if err != nil {
 		return err
 	}
+	defer w.Close()
 
 	_, err = w.Write(msg)
 	if err != nil {
 		return err
 	}
 
-	err = w.Close()
-	if err != nil {
-		return err
-	}
-
-	return c.Quit()
+	return nil
 }
 
 func (this *EmailService) SendEmail(to, subject, body string) (ok bool, e string) {
@@ -443,30 +439,28 @@ func (this *EmailService) SendEmailToUsers(users []info.User, subject, body stri
 		return
 	}
 
-	go func() {
-		for _, user := range users {
-			LogJ(user)
-			m := map[string]interface{}{}
-			m["userId"] = user.UserId.Hex()
-			m["username"] = user.Username
-			m["email"] = user.Email
-			ok2, msg2, subject2, body2 := this.renderEmail(subject, body, m)
-			ok = ok2
-			msg = msg2
-			if ok2 {
-				sendOk, msg := this.SendEmail(user.Email, subject2, body2)
-				this.AddEmailLog(user.Email, subject, body, sendOk, msg) // 把模板记录下
-				// 记录到Email Log
-				if sendOk {
-					// Log("ok " + user.Email)
-				} else {
-					// Log("no " + user.Email)
-				}
+	for _, user := range users {
+		LogJ(user)
+		m := map[string]interface{}{}
+		m["userId"] = user.UserId.Hex()
+		m["username"] = user.Username
+		m["email"] = user.Email
+		ok2, msg2, subject2, body2 := this.renderEmail(subject, body, m)
+		ok = ok2
+		msg = msg2
+		if ok2 {
+			sendOk, msg := this.SendEmail(user.Email, subject2, body2)
+			this.AddEmailLog(user.Email, subject, body, sendOk, msg) // 把模板记录下
+			// 记录到Email Log
+			if sendOk {
+				// Log("ok " + user.Email)
 			} else {
-				// Log(msg);
+				// Log("no " + user.Email)
 			}
+		} else {
+			// Log(msg);
 		}
-	}()
+	}
 
 	return
 }
@@ -484,7 +478,6 @@ func (this *EmailService) SendEmailToEmails(emails []string, subject, body strin
 		return
 	}
 
-	//	go func() {
 	for _, email := range emails {
 		if email == "" {
 			continue
@@ -505,7 +498,6 @@ func (this *EmailService) SendEmailToEmails(emails []string, subject, body strin
 			Log(msg)
 		}
 	}
-	//	}()
 
 	return
 }
@@ -517,7 +509,6 @@ func (this *EmailService) AddEmailLog(email, subject, body string, ok bool, msg 
 }
 
 // 展示邮件日志
-
 func (this *EmailService) DeleteEmails(ids []string) bool {
 	idsO := make([]bson.ObjectId, len(ids))
 	for i, id := range ids {

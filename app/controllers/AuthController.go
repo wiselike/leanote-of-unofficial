@@ -158,9 +158,8 @@ func (c Auth) FindPassword() revel.Result {
 	return c.RenderTemplate("home/find_password.html")
 }
 func (c Auth) DoFindPassword(email string) revel.Result {
-	pwdService.FindPwd(email)
 	re := info.NewRe()
-	re.Ok = true
+	re.Ok, re.Msg = pwdService.FindPwd(email)
 	return c.RenderJSON(re)
 }
 

@@ -93,6 +93,28 @@ func (c User) ReSendActiveEmail() revel.Result {
 	return c.RenderJSON(re)
 }
 
+// 发送更新邮箱的激活邮件
+func (c User) UpdateEmailSendActiveEmail(email, pwd string) revel.Result {
+	re := info.NewRe()
+	if c.GetUsername() == "demo" {
+		re.Ok = false
+		re.Msg = "cannotUpdateDemo"
+		return c.RenderJSON(re)
+	}
+	if re.Ok, re.Msg = Vd("email", email); !re.Ok {
+		return c.RenderJSON(re)
+	}
+
+	userInfo := c.GetUserInfo()
+	if !ComparePwd(pwd, userInfo.Pwd) {
+		re.Ok = false
+		re.Msg = "wrongPassword"
+		return c.RenderJSON(re)
+	}
+	re.Ok, re.Msg = emailService.UpdateEmailSendActiveEmail(c.GetUserInfo(), email)
+	return c.RenderJSON(re)
+}
+
 // 通过点击链接
 // 修改邮箱
 func (c User) UpdateEmail(token string) revel.Result {

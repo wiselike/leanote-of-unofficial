@@ -373,7 +373,7 @@ func (this *UserService) ActiveEmail(token string) (ok bool, msg, email string) 
 		userInfo := this.GetUserInfoByEmail(email)
 		if userInfo.UserId == "" {
 			ok = false
-			msg = "不存在该用户"
+			msg = "不存在用户"
 			return
 		}
 
@@ -382,8 +382,7 @@ func (this *UserService) ActiveEmail(token string) (ok bool, msg, email string) 
 		return
 	}
 
-	ok = false
-	msg = "该链接已过期"
+	// ok为false，直接return msg
 	return
 }
 
