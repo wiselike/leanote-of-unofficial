@@ -304,12 +304,13 @@ func IsGoodPwd(pwd string) (bool, string) {
 }
 
 // 是否是email
+var isEmailCompile = regexp.MustCompile(`^([a-zA-Z0-9]+[_|\_|\.|\-]*)*[a-zA-Z0-9\-_]+@([a-zA-Z0-9\-]+[_|\_|\.|\-]?)*[a-zA-Z0-9\-]+\.[0-9a-zA-Z]{2,6}$`)
+
 func IsEmail(email string) bool {
 	if email == "" {
 		return false
 	}
-	ok, _ := regexp.MatchString(`^([a-zA-Z0-9]+[_|\_|\.|\-]?)*[_a-z\-A-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.|\-]?)*[a-zA-Z0-9\-]+\.[0-9a-zA-Z]{2,6}$`, email)
-	return ok
+	return isEmailCompile.MatchString(email)
 }
 
 // 是否只包含数字, 字母 -, _

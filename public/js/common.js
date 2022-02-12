@@ -810,7 +810,7 @@ function post(url, param, func, btnId) {
 
 // 是否是正确的email
 function isEmail(email) {
-	var myreg = /^([a-zA-Z0-9]+[_|\_|\.|\-]?)*[a-zA-Z0-9\-]+@([a-zA-Z0-9\-]+[_|\_|\.|\-]?)*[a-zA-Z0-9\-]+\.[0-9a-zA-Z]{2,3}$/;
+	var myreg = /^([a-zA-Z0-9]+[_|\_|\.|\-]*)*[a-zA-Z0-9\-_]+@([a-zA-Z0-9\-]+[_|\_|\.|\-]?)*[a-zA-Z0-9\-]+\.[0-9a-zA-Z]{2,6}$/;
 	return myreg.test(email);
 }
 
@@ -1022,7 +1022,7 @@ var vd = {
 	    return result;
 	},
 	isEmail: function(emailValue){
-	    var emailPattern=/^([a-zA-Z0-9]+[_|\_|\.|\-]?)*[a-zA-Z0-9\-]+@([a-zA-Z0-9\-]+[_|\_|\.|\-]?)*[a-zA-Z0-9\-]+\.[0-9a-zA-Z]{2,3}$/; //邮箱的正则表达式
+	    var emailPattern=/^([a-zA-Z0-9]+[_|\_|\.|\-]*)*[a-zA-Z0-9\-_]+@([a-zA-Z0-9\-]+[_|\_|\.|\-]?)*[a-zA-Z0-9\-]+\.[0-9a-zA-Z]{2,6}$/; //邮箱的正则表达式
 	    result=emailPattern.test(emailValue);
 	   
 	    return result;
