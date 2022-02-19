@@ -30,7 +30,6 @@ var sessionService *service.SessionService
 
 var pageSize = 1000
 var defaultSortField = "UpdatedTime"
-var leanoteUserId = "admin" // 不能更改
 
 // 状态
 const (

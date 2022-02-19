@@ -36,10 +36,7 @@ func (this *ConfigService) InitGlobalConfigs() bool {
 	this.GlobalMapConfigs = map[string]map[string]string{}
 	this.GlobalArrMapConfigs = map[string][]map[string]string{}
 
-	this.adminUsername, _ = revel.Config.String("adminUsername")
-	if this.adminUsername == "" {
-		this.adminUsername = "admin"
-	}
+	this.adminUsername = revel.Config.StringDefault("adminUsername", "admin")
 	this.siteUrl, _ = revel.Config.String("site.url")
 
 	userInfo := userService.GetUserInfoByAny(this.adminUsername)
@@ -90,6 +87,13 @@ func (this *ConfigService) GetSiteUrl() string {
 }
 func (this *ConfigService) GetAdminUsername() string {
 	return this.adminUsername
+}
+func (this *ConfigService) UpdateAdminUsername(name string) bool {
+	if err := UpdateConfig("adminUsername", name); err == nil {
+		this.adminUsername = name
+		return true
+	}
+	return false
 }
 func (this *ConfigService) GetAdminUserId() string {
 	return this.adminUserId

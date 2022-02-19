@@ -287,7 +287,7 @@ func (this *UserService) GetUserInfoByName(emailOrUsername string) info.User {
 
 // 更新username
 func (this *UserService) UpdateUsername(userId, username string) (bool, string) {
-	if userId == "" || username == "" || username == "admin" { // admin用户是内置的, 不能设置
+	if userId == "" || username == "" {
 		return false, "usernameIsExisted"
 	}
 	usernameRaw := username // 原先的, 可能是同一个, 但有大小写
@@ -299,7 +299,19 @@ func (this *UserService) UpdateUsername(userId, username string) (bool, string) 
 		return false, "usernameIsExisted"
 	}
 
+	origUser := this.GetUser(userId) //先获取到原始的用户名
 	ok := db.UpdateByQMap(db.Users, bson.M{"_id": userIdO}, bson.M{"Username": username, "UsernameRaw": usernameRaw})
+	if ok {
+		if configService.GetAdminUsername() == origUser.Username { // 更新admin用户的话，需要更新app.conf
+			if ok = configService.UpdateAdminUsername(username); !ok { // 更新配置文件失败的话，就回退
+				db.UpdateByQMap(db.Users, bson.M{"_id": userIdO}, bson.M{"Username": origUser.Username, "UsernameRaw": origUser.UsernameRaw})
+				return false, "无法更新admin用户，更新app.conf配置文件异常"
+			}
+		}
+	} else {
+		return false, "数据库异常，无法更新用户名"
+	}
+
 	return ok, ""
 }
 
