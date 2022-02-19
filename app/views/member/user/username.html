@@ -11,19 +11,19 @@
 				<div class="form-group">
 					<!-- <label>{{msg . "Username"}}</label> -->
 					<input type="text" class="form-control" id="username"
-				    	value="{{.userInfo.Username}}"
-				    	data-rules='[
-				    		{rule: "required", msg: "inputUsername"}, 
-				    		{rule: "noSpecialChars", msg: "noSpecialChars"},
-				    		{rule: "minLength", data: 4, msg: "minLength", msgData: 4}
-				    		]'
-				    	data-msg_target="#usernameMsg"
-				    />
+						value="{{.userInfo.Username}}"
+						data-rules='[
+							{rule: "required", msg: "inputUsername"},
+							{rule: "noSpecialChars", msg: "noSpecialChars"},
+							{rule: "minLength", data: 2, msg: "minLength", msgData: 2}
+							]'
+						data-msg_target="#usernameMsg"
+					/>
   					{{msg . "setUsernameTips" .userInfo.Email}}
 				</div>
 			</div>
 			<footer class="panel-footer text-right bg-light lter">
-			    <button type="submit" id="usernameBtn" class="btn btn-success">{{msg . "submit"}}</button>
+				<button type="submit" id="usernameBtn" class="btn btn-success">{{msg . "submit"}}</button>
 			</footer>
 		</section>
 	</form>

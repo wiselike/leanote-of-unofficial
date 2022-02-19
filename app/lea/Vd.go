@@ -12,7 +12,7 @@ var rulesStr = `{
 	"username": [
 		{"rule": "required", "msg": "inputUsername"}, 
 		{"rule": "noSpecialChars", "msg": "noSpecialChars"},
-		{"rule": "minLength", "data": "4", "msg": "minLength", "msgData": "4"}
+		{"rule": "minLength", "data": "2", "msg": "minLength", "msgData": "2"}
 	],
 	"email": [
 		{"rule": "required", "msg": "inputEmail"}, 
@@ -117,7 +117,7 @@ var rules = map[string]func(string, map[string]string) (bool, string){
 			ok = true
 			return // 可为空
 		}
-		if len(value) < 4 {
+		if len(value) < 2 {
 			ok = false
 			return
 		}

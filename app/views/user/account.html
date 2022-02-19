@@ -1,11 +1,11 @@
 <div class="modal-dialog modal-sm" id="accountInfoDialog">
 	<div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="modalTitle">{{msg . "accountSetting"}}</h4>
-      </div>
-      
-      {{if .userInfo.Email}}
+	  <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title" id="modalTitle">{{msg . "accountSetting"}}</h4>
+	  </div>
+
+	  {{if .userInfo.Email}}
 		<div class="modal-body">
 			<ul class="nav nav-tabs" id="infoTabs">
 			  <li class="active"><a href="#baseInfo" data-toggle="tab">{{msg . "basicInfo"}}</a></li>
@@ -15,56 +15,55 @@
 			<div class="tab-content">
 			
 			  <div class="tab-pane active" id="baseInfo">
-			  	<form>
-	  				<div class="alert alert-danger" id="usernameMsg" style="display: none"></div>
-	  				<label for="username">{{msg . "setUsername"}}</label>
-				    <input type="text" class="form-control" id="username"
-				    	value="{{.userInfo.Username}}"
-				    	data-rules='[
-				    		{rule: "required", msg: "inputUsername"}, 
-				    		{rule: "noSpecialChars", msg: "noSpecialChars"},
-				    		{rule: "minLength", data: 4, msg: "minLength", msgData: 4}
-				    		]'
-				    	data-msg_target="#usernameMsg"
-				    />
-  					{{msg . "setUsernameTips" .userInfo.Email}}
-  			
-  					<div>
-					    <button id="usernameBtn" class="btn btn-success">{{msg . "submit"}}</button>
-				    </div>
-  			
-		  		</form>
+				<form>
+					<div class="alert alert-danger" id="usernameMsg" style="display: none"></div>
+					<label for="username">{{msg . "setUsername"}}</label>
+					<input type="text" class="form-control" id="username"
+						value="{{.userInfo.Username}}"
+						data-rules='[
+							{rule: "required", msg: "inputUsername"}, 
+							{rule: "noSpecialChars", msg: "noSpecialChars"},
+							{rule: "minLength", data: 2, msg: "minLength", msgData: 2}
+							]'
+						data-msg_target="#usernameMsg"
+					/>
+					{{msg . "setUsernameTips" .userInfo.Email}}
+						<div>
+						<button id="usernameBtn" class="btn btn-success">{{msg . "submit"}}</button>
+					</div>
+				
+				</form>
 			  </div>
 			  
 			  <div class="tab-pane" id="emailInfo">
-			  	<form>
-			  		
-		  				{{msg . "currentEmail" .userInfo.Email}}
-		  				{{if .userInfo.Verified}}
-		  					<span class="label label-green">{{msg . "verified"}}</span>
-		  				{{else}}
-		  					<span class="label label-red">{{msg . "unVerified"}}</span>
+				<form>
+					
+						{{msg . "currentEmail" .userInfo.Email}}
+						{{if .userInfo.Verified}}
+							<span class="label label-green">{{msg . "verified"}}</span>
+						{{else}}
+							<span class="label label-red">{{msg . "unVerified"}}</span>
 							<a class="raw nowToActive">{{msg . "verifiedNow"}}</a> 
 							{{msg . "or"}}
 							<a class="raw reSendActiveEmail">{{msg . "resendVerifiedEmail"}}</a> 
-		  				{{end}}
-		  				<br />
-		  				<label for="email">{{msg . "updateEmail"}}</label>
-		  				<div class="alert alert-danger" id="emailMsg" style="display: none" placeholder="New Email"></div>
-					    <input type="text" class="form-control" 
-					    	id="email" 
-					    	data-rules='[
-						    	{rule: "required", msg: "inputEmail"},
-						    	{rule: "email", msg: "errorEmail"}
-					    	]'
-					    	data-msg_target="#emailMsg"
-					    />
-					    {{msg . "updateEmailTips"}}
-		  			
-			  			<div>
-						    <button id="emailBtn" class="btn btn-success">{{msg . "sendVerifiedEmail"}}</button>
+						{{end}}
+						<br />
+						<label for="email">{{msg . "updateEmail"}}</label>
+						<div class="alert alert-danger" id="emailMsg" style="display: none" placeholder="New Email"></div>
+						<input type="text" class="form-control" 
+							id="email" 
+							data-rules='[
+								{rule: "required", msg: "inputEmail"},
+								{rule: "email", msg: "errorEmail"}
+							]'
+							data-msg_target="#emailMsg"
+						/>
+						{{msg . "updateEmailTips"}}
+					
+						<div>
+							<button id="emailBtn" class="btn btn-success">{{msg . "sendVerifiedEmail"}}</button>
 						</div>
-		  		</form>
+				</form>
 			  </div>
 			  <div class="tab-pane" id="updatePwd">
 			  <form>
@@ -73,32 +72,32 @@
 				<div class="form-group">
 					<label class="control-label" for="oldPwd">{{msg . "oldPassword"}}</label>
 					 <input type="password" class="form-control" id="oldPwd" name="oldPwd"
-				    	data-rules='[
-					    	{rule: "required", msg: "inputPassword"}
-				    	]'
-				    	data-msg_target="#pwdMsg"
-				    />
+						data-rules='[
+							{rule: "required", msg: "inputPassword"}
+						]'
+						data-msg_target="#pwdMsg"
+					/>
 				</div>
 				<div class="form-group"> 
 					<label class="control-label" for="pwd">{{msg . "newPassword"}}</label>
 					<input type="password" class="form-control" id="pwd" name="pwd"
-					    data-rules='[
-					    	{rule: "required", msg: "inputNewPassword"},
-					    	{rule: "password", msg: "errorPassword"}
-				    	]'
-				    	data-msg_target="#pwdMsg"
-				    >
+						data-rules='[
+							{rule: "required", msg: "inputNewPassword"},
+							{rule: "password", msg: "errorPassword"}
+						]'
+						data-msg_target="#pwdMsg"
+					>
 					{{msg . "passwordTips"}}
 				</div>
 				<div class="form-group"> 
 					<label class="control-label" for="pwd2">{{msg . "password2"}}</label>
 					 <input type="password" class="form-control" id="pwd2" name="pwd2"
-					    data-rules='[
-					    	{rule: "required", msg: "inputPassword2"},
-					    	{rule: "equalTo", data:"#pwd", msg: "confirmPassword"}
-				    	]'
-				    	data-msg_target="#pwdMsg"
-				    />
+						data-rules='[
+							{rule: "required", msg: "inputPassword2"},
+							{rule: "equalTo", data:"#pwd", msg: "confirmPassword"}
+						]'
+						data-msg_target="#pwdMsg"
+					/>
 				</div>
 				
 				<button id="pwdBtn" class="btn btn-success">{{msg . "submit"}}</button>
@@ -120,31 +119,31 @@
 					<label class="control-label" for="thirdEmail">{{msg . "email"}}</label>
 					<input type="text" class="form-control" id="thirdEmail" name="email"
 						data-rules='[
-					    	{rule: "required", msg: "inputEmail"},
-					    	{rule: "email", msg: "errorEmail"}
-				    	]'
-				    	data-msg_target="#thirdAccountMsg"
+							{rule: "required", msg: "inputEmail"},
+							{rule: "email", msg: "errorEmail"}
+						]'
+						data-msg_target="#thirdAccountMsg"
 					> 
 				</div>
 				<div class="form-group"> 
 					<label class="control-label" for="thirdPwd">{{msg . "password"}}</label>
 					<input type="password" class="form-control" id="thirdPwd" name="pwd"
 					  data-rules='[
-					    	{rule: "required", msg: "inputPassword"},
-					    	{rule: "password", msg: "errorPassword"}
-				    	]'
-				    	data-msg_target="#thirdAccountMsg"
+							{rule: "required", msg: "inputPassword"},
+							{rule: "password", msg: "errorPassword"}
+						]'
+						data-msg_target="#thirdAccountMsg"
 					/>
 					{{msg . "passwordTips"}} 
 				</div>
 				<div class="form-group"> 
 					<label class="control-label" for="thirdPwd2">{{msg . "password2"}}</label>
 					<input type="password" class="form-control" id="thirdPwd2" name="pwd2" 
-					 	data-rules='[
-					    	{rule: "required", msg: "inputPassword2"},
-					    	{rule: "equalTo", data:"#thirdPwd", msg: "confirmPassword"}
-				    	]'
-				    	data-msg_target="#thirdAccountMsg"
+						data-rules='[
+							{rule: "required", msg: "inputPassword2"},
+							{rule: "equalTo", data:"#thirdPwd", msg: "confirmPassword"}
+						]'
+						data-msg_target="#thirdAccountMsg"
 					>
 				</div>
 				
