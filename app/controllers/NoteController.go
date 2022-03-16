@@ -204,6 +204,7 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 			Abstract: noteOrContent.Abstract}
 
 		noteImageService.OrganizeImageFiles(c.GetUserId(), noteOrContent.Title, noteOrContent.Content)
+		attachService.OrganizeAttachFiles(c.GetUserId(), noteOrContent.Title, noteOrContent.Content)
 
 		note = noteService.AddNoteAndContentForController(note, noteContent, c.GetUserId())
 		return c.RenderJSON(note)
@@ -255,6 +256,8 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 
 	if c.Has("Title") || c.Has("Content") {
 		noteImageService.ReOrganizeImageFiles(c.GetUserId(), noteOrContent.NoteId, noteOrContent.Title, noteOrContent.Content, c.Has("Title"), c.Has("Content"))
+		attachService.ReOrganizeAttachFiles(c.GetUserId(), noteOrContent.NoteId, noteOrContent.Title, noteOrContent.Content, c.Has("Title"), c.Has("Content"))
+
 	}
 
 	// Log("usn", "afterContentUsn", afterContentUsn + "")

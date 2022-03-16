@@ -1,12 +1,14 @@
 package service
 
 import (
+	"fmt"
 	"github.com/leanote/leanote/app/db"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -245,4 +247,88 @@ func (this *AttachService) UpdateOrDeleteAttachApi(noteId, userId string, files 
 
 	return false
 
+}
+
+var noteAttachReg = regexp.MustCompile("(getAttach)\\?fileId=([a-z0-9A-Z]+)")
+
+// 整理node附件，按标题来存放，以便于到服务器上检索维护
+func (this *AttachService) OrganizeAttachFiles(userId, title, content string) (rmDir string) {
+	// 获取所有的fileId
+	find := noteAttachReg.FindAllStringSubmatch(content, -1) // 查找
+	if find == nil || len(find) < 1 {
+		return
+	}
+
+	// 格式化titile
+	if title == "" {
+		title = "empty-titles-set"
+	} else {
+		title = FixFilename(title)
+	}
+
+	basePath := ConfigS.GlobalStringConfigs["files.dir"]
+	newDbPathDir := path.Join(GetRandomFilePath(userId, ""), "/attachs/", title)
+	newPathDir := path.Join(basePath, newDbPathDir)
+	if err := os.MkdirAll(newPathDir, 0755); err != nil {
+		return
+	}
+	for i, each := range find {
+		if each != nil && len(each) == 3 {
+			// 查找原路径
+			file := info.Attach{}
+			if db.Get(db.Attachs, each[2], &file); file.Path != "" {
+				// 创建文件名，并移动路径
+				oldFullPath := path.Join(basePath, file.Path)
+				fname := strings.Split(path.Base(file.Path), "_")
+				file.Path = path.Join(newDbPathDir, fmt.Sprintf("%d_%s", i, fname[len(fname)-1]))
+				newFullPath := path.Join(basePath, file.Path)
+				if oldFullPath != newFullPath {
+					if err := os.Rename(oldFullPath, newFullPath); err == nil {
+						// 更新数据库
+						if ok := db.Update(db.Attachs, bson.M{"_id": bson.ObjectIdHex(each[2])}, file); !ok {
+							// 数据库写失败，回滚
+							os.Rename(newFullPath, oldFullPath)
+							continue
+						}
+						// 保存第一个附件的文件夹，作为旧路径，用于删除
+						if rmDir == "" {
+							rmDir = path.Dir(oldFullPath)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 没有移动任何文件的话，则仅删除空文件夹
+	if rmDir == "" {
+		os.Remove(newPathDir)
+		return
+	}
+
+	// 带文件夹结束符，避免比较到部分文件名
+	// 避免删除空标题集合文件夹
+	if strings.HasPrefix(newPathDir+"/", rmDir+"/") || path.Base(rmDir) == "empty-titles-set" {
+		return "" // 不删除
+	}
+	return
+}
+
+// 整理node附件，同上。带删除旧文件夹
+func (this *AttachService) ReOrganizeAttachFiles(userId, noteId, title, content string, hasTitle, hasContent bool) bool {
+	if !hasTitle && !hasContent {
+		return true
+	}
+	if !hasTitle { // 获取title
+		title = noteService.GetNote(noteId, userId).Title
+	}
+	if !hasContent { // 获取content
+		content = noteService.GetNoteContent(noteId, userId).Content
+	}
+
+	if oldDir := this.OrganizeAttachFiles(userId, title, content); oldDir != "" {
+		// 删旧文件夹
+		os.RemoveAll(oldDir)
+	}
+	return true
 }
