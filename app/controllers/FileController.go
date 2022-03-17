@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"time"
 )
 
 // 首页
@@ -171,7 +172,7 @@ func (c File) uploadImage(from, albumId string) (re info.Re) {
 		return re
 	}
 	// 改变成gif图片
-	_, toPathGif := TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins"))
+	_, toPathGif := TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins", c.GetUserId(), time.Now().Format("2006")))
 	filename = GetFilename(toPathGif)
 	filesize := GetFilesize(toPathGif)
 	fileUrlPath += "/" + filename

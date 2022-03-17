@@ -1,20 +1,16 @@
 package api
 
 import (
-	"gopkg.in/mgo.v2/bson"
-	//	"encoding/json"
 	"github.com/leanote/leanote/app/controllers"
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"github.com/leanote/leanote/app/service"
+	"gopkg.in/mgo.v2/bson"
+	"io/ioutil"
 	"os"
 	"path"
-	//	"fmt"
-	"io/ioutil"
-	//	"fmt"
-	//	"math"
-	//	"strconv"
 	"strings"
+	"time"
 )
 
 // 公用Controller, 其它Controller继承它
@@ -185,7 +181,7 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 		return
 	}
 	// 改变成gif图片
-	_, toPathGif := TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins"))
+	_, toPathGif := TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins", c.GetUserId(), time.Now().Format("2006")))
 	filename = GetFilename(toPathGif)
 	filesize := GetFilesize(toPathGif)
 

@@ -402,7 +402,7 @@ func (c MemberBlog) uploadImage(themeId string) (re info.Re) {
 		LogJ(err)
 		return re
 	}
-	TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins"))
+	TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins", c.GetUserId(), time.Now().Format("2006")))
 	resultCode = 1
 	resultMsg = "上传成功!"
 
