@@ -169,19 +169,21 @@ func (c Attach) DownloadAll(noteId string) revel.Result {
 		}
 	*/
 
-	filename := note.Title + ".tar.gz"
+	var filename string
 	if note.Title == "" {
 		filename = "all.tar.gz"
+	} else {
+		filename = FixFilename(note.Title) + ".tar.gz"
 	}
 
 	basePath := service.ConfigS.GlobalStringConfigs["files.dir"]
-	dir := path.Join(basePath, "attach_all")
+	dir := path.Join(basePath, GetRandomFilePath(c.GetUserId(), ""), "attach_all", time.Now().Format("2006"))
 	if !MkdirAll(dir) {
 		return c.RenderText("error")
 	}
 
 	// file write
-	fw, err := os.Create(dir + "/" + filename)
+	fw, err := os.Create(path.Join(dir, filename))
 	if err != nil {
 		return c.RenderText("error")
 	}
