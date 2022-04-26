@@ -1905,15 +1905,18 @@ textarea#wmd-input {
   border-bottom: 1px solid #ebeff2;
   margin: 0 -5px;
 }
+#noteItemList.list .item.item-bt .item-blogtop,
 #noteItemList.list .item.item-b .item-blog {
   display: none;
 }
+#noteItemList.list .item.item-bt:hover .item-blogtop,
 #noteItemList.list .item.item-b:hover .item-blog {
   display: block;
 }
 #noteItemList.list .item-thumb {
   display: none;
 }
+#noteItemList.list .item-blogtop,
 #noteItemList.list .item-blog {
   display: none;
   top: auto;
@@ -2001,6 +2004,7 @@ textarea#wmd-input {
   -moz-user-select: none;
 }
 #noteItemList .item-setting,
+#noteItemList .item-blogtop,
 #noteItemList .item-blog {
   position: absolute;
   right: 1px;
@@ -2015,17 +2019,21 @@ textarea#wmd-input {
   background-color: #464C5E;
 }
 #noteItemList .item-setting .fa,
+#noteItemList .item-blogtop .fa,
 #noteItemList .item-blog .fa {
   color: #fff !important;
 }
 #noteItemList .item-setting:hover,
+#noteItemList .item-blogtop:hover,
 #noteItemList .item-blog:hover {
   opacity: 0.8;
 }
+#noteItemList .item-blogtop,
 #noteItemList .item-blog {
   top: 1px;
   display: none;
 }
+#noteItemList .item-bt .item-blogtop,
 #noteItemList .item-b .item-blog {
   display: block;
 }
@@ -2973,6 +2981,7 @@ h3 {
     height: 118px;
   }
   #noteItemList .item-setting,
+  #noteItemList .item-blogtop,
   #noteItemList .item-blog {
     font-size: 16px;
     width: 30px;
@@ -3229,6 +3238,7 @@ h3 {
   .leanote-plugin .ztree li a.level0 span,
   .leanote-plugin .ztree li a.level1 span,
   .leanote-plugin #noteItemList .item-setting,
+  .leanote-plugin #noteItemList .item-blogtop,
   .leanote-plugin #noteItemList .item-blog {
     font-size: 14px;
   }
@@ -3248,6 +3258,7 @@ h3 {
     font-size: 16px;
   }
   .leanote-plugin #noteItemList .item-setting,
+  .leanote-plugin #noteItemList .item-blogtop,
   .leanote-plugin #noteItemList .item-blog {
     width: 23px;
     padding: 1px;
