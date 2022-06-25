@@ -198,10 +198,11 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 			IsMarkdown: noteOrContent.IsMarkdown,
 		}
 		noteContent := info.NoteContent{NoteId: note.NoteId,
-			UserId:   userId,
-			IsBlog:   note.IsBlog,
-			Content:  noteOrContent.Content,
-			Abstract: noteOrContent.Abstract}
+			UserId:       userId,
+			IsBlog:       note.IsBlog,
+			IsAutoBackup: noteOrContent.IsAutoBackup,
+			Content:      noteOrContent.Content,
+			Abstract:     noteOrContent.Abstract}
 
 		noteImageService.OrganizeImageFiles(c.GetUserId(), noteOrContent.Title, noteOrContent.Content)
 		attachService.OrganizeAttachFiles(c.GetUserId(), noteOrContent.Title, noteOrContent.Content)
@@ -250,8 +251,8 @@ func (c Note) UpdateNoteOrContent(noteOrContent info.NoteOrContent) revel.Result
 			noteOrContent.NoteId, noteOrContent.Content, noteOrContent.Abstract,
 			needUpdateNote, noteOrContent.IsAutoBackup, -1, time.Now())
 	} else if !noteOrContent.IsAutoBackup {
-		// 更新一下最后一条历史记录的状态（更新为手动历史）
-		noteContentHistoryService.UpdateHistoryBackupState(noteOrContent.NoteId, c.GetUserId(), noteOrContent.IsAutoBackup)
+		// 更新一下noteContent的状态（更新为手动保存的状态）
+		noteService.UpdateAutoBackupState(noteOrContent.NoteId, c.GetUserId(), noteOrContent.IsAutoBackup)
 	}
 
 	if c.Has("Title") || c.Has("Content") {

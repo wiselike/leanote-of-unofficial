@@ -560,6 +560,10 @@ func (this *NoteService) UpdateNoteContentIsBlog(noteId, userId string, isBlog b
 	db.UpdateByIdAndUserIdMap(db.NoteContents, noteId, userId, bson.M{"IsBlog": isBlog})
 }
 
+func (this *NoteService) UpdateAutoBackupState(noteId, userId string, isAutoBackup bool) {
+	db.UpdateByIdAndUserIdMap(db.NoteContents, noteId, userId, bson.M{"IsAutoBackup": isAutoBackup})
+}
+
 // 附件修改, 增加noteIncr
 func (this *NoteService) IncrNoteUsn(noteId, userId string) int {
 	afterUsn := userService.IncrUsn(userId)
@@ -608,9 +612,10 @@ func (this *NoteService) UpdateNoteContent(updatedUserId, noteId, content, abstr
 
 	// abstract重置
 	data := bson.M{"UpdatedUserId": bson.ObjectIdHex(updatedUserId),
-		"Content":     content,
-		"Abstract":    abstract,
-		"UpdatedTime": updatedTime}
+		"Content":      content,
+		"IsAutoBackup": isAutoBackup,
+		"Abstract":     abstract,
+		"UpdatedTime":  updatedTime}
 
 	if note.IsBlog && note.HasSelfDefined {
 		delete(data, "Abstract")
@@ -628,12 +633,13 @@ func (this *NoteService) UpdateNoteContent(updatedUserId, noteId, content, abstr
 		db.UpdateByIdAndUserIdField(db.Notes, noteId, userId, "Usn", afterUsn)
 	}
 
+	oldContent := this.GetNoteContent(noteId, userId)
 	if db.UpdateByIdAndUserIdMap(db.NoteContents, noteId, userId, data) {
-		// 这里, 添加历史记录
+		// 更新文章成功, 则添加旧文章到历史记录里
 		noteContentHistoryService.AddHistory(noteId, userId, info.EachHistory{UpdatedUserId: bson.ObjectIdHex(updatedUserId),
-			IsAutoBackup: isAutoBackup,
-			Content:      content,
-			UpdatedTime:  time.Now(),
+			IsAutoBackup: oldContent.IsAutoBackup,
+			Content:      oldContent.Content, // 把旧文章加入历史
+			UpdatedTime:  oldContent.UpdatedTime,
 		})
 
 		// 更新笔记图片

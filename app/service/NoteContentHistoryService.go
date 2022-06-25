@@ -12,7 +12,18 @@ import (
 type NoteContentHistoryService struct {
 }
 
-// 新建一个note, 不需要添加历史记录
+var UseMongoVer int
+
+func isMongo2() bool {
+	if db.Session != nil {
+		if info, err := db.Session.BuildInfo(); err == nil {
+			return !info.VersionAtLeast(3)
+		}
+	}
+	return true
+}
+
+// 新建一个note, 不添加历史记录
 // 添加历史，在数据库中倒序存放：前面的是老的，后面是新的（与原来的顺序相反）
 func (this *NoteContentHistoryService) AddHistory(noteId, userId string, oneHistory info.EachHistory) {
 	// 检查是否是空
@@ -26,20 +37,30 @@ func (this *NoteContentHistoryService) AddHistory(noteId, userId string, oneHist
 		return
 	}
 
-	//注释掉下面这个块，使用mongodb3的块，可以优化速度和效率
-	history := info.NoteContentHistory{}
-	db.GetByIdAndUserId(db.NoteContentHistories, noteId, userId, &history) // TODO 优化掉, 只获取数字即可
-	var historiesLenth int
-	if history.NoteId == "" {
-		historiesLenth = -1
-	} else {
-		historiesLenth = len(history.Histories)
+	// 判断使用的mongo版本
+	if UseMongoVer == 0 {
+		if isMongo2() {
+			UseMongoVer = 2
+		} else {
+			UseMongoVer = 3
+		}
 	}
 
-	/* mongodb3才支持
-	// 优化为只获取数字，不获取所有历史的正文
-	historiesLenth := db.GetNoteHistoriesCount(db.NoteContentHistories, noteId, userId)
-	*/
+	var historiesLenth int
+	if UseMongoVer == 2 {
+		// 使用mongodb2的版本，效率较低，而且耗内存
+		history := info.NoteContentHistory{}
+		db.GetByIdAndUserId(db.NoteContentHistories, noteId, userId, &history)
+		if history.NoteId == "" {
+			historiesLenth = -1
+		} else {
+			historiesLenth = len(history.Histories)
+		}
+	} else {
+		// mongodb3才支持，可以优化速度和效率
+		// 只获取数字即可，不获取所有历史的正文内容
+		historiesLenth = db.GetNoteHistoriesCount(db.NoteContentHistories, noteId, userId)
+	}
 
 	if historiesLenth == -1 {
 		this.newHistory(noteId, userId, oneHistory)

@@ -61,6 +61,7 @@ type NoteContent struct {
 	Content  string `Content`
 	Abstract string `Abstract` // 摘要, 有html标签, 比content短, 在博客展示需要, 不放在notes表中
 
+	IsAutoBackup  bool          `IsAutoBackup` // 标记此文章是否是前台自动保存的
 	CreatedTime   time.Time     `CreatedTime`
 	UpdatedTime   time.Time     `UpdatedTime`
 	UpdatedUserId bson.ObjectId `bson:"UpdatedUserId"` // 如果共享了, 并可写, 那么可能是其它他修改了
