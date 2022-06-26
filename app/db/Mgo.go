@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strings"
+	"time"
 )
 
 // Init mgo and the common DAO
@@ -225,6 +226,11 @@ func UpdateByIdAndUserIdMap(collection *mgo.Collection, id, userId string, v bso
 func UpdateHistoryBackupState(collection *mgo.Collection, id, userId string, isAutoBackup bool) bool {
 	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id), "UserId": bson.ObjectIdHex(userId), "Histories.IsAutoBackup": true},
 		bson.M{"$set": bson.M{"Histories.$.IsAutoBackup": isAutoBackup}})
+	return Err(err)
+}
+func DeleteOneHistory(collection *mgo.Collection, id, userId string, timeToDel time.Time) bool {
+	err := collection.Update(bson.M{"_id": bson.ObjectIdHex(id), "UserId": bson.ObjectIdHex(userId)},
+		bson.M{"$pull": bson.M{"Histories": bson.M{"UpdatedTime": timeToDel}}})
 	return Err(err)
 }
 func UpdateByIdAndUserIdField2(collection *mgo.Collection, id, userId bson.ObjectId, field string, value interface{}) bool {

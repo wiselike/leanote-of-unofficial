@@ -18,6 +18,7 @@ define('history', [], function() {
                         '<div class="history-content-wrap pull-left">',
                             '<div class="history-content-header">',
                                 '<a class="btn btn-primary back">' + getMsg('restoreFromThisVersion') + '</a>',
+                                '<a class="btn btn-primary delete">' + getMsg('deleteThisHistoryVersion') + '</a>',
                                 '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>',
                             '</div>',
                             '<div class="history-content"></div>',
@@ -84,7 +85,7 @@ define('history', [], function() {
                 me.renderContent(index);
             });
 
-            // 还原
+            // 从该历史记录还原
             $tpl.find('.back').click(function() {
                 if(confirm(getMsg("confirmBackup"))) {
                     // 保存当前版本
@@ -99,6 +100,14 @@ define('history', [], function() {
                     Note.curChangedSaveIt(true);
                 }
             });
+            // 删除该历史记录
+            $tpl.find('.delete').click(function() {
+                if(confirm(getMsg("confirmHistoryDelete"))) {
+                    ajaxPost("/noteContentHistory/deleteHistory", {noteId: Note.curNoteId, userId: Note.cache[Note.curNoteId].UserId, timeToDel: me.list[me.curIndex].UpdatedTime}, function(re) {
+                        me.getHistories();
+                    });
+                }
+            });
         },
 
         getHistories: function () {
@@ -106,8 +115,9 @@ define('history', [], function() {
             var note = Note.getCurNote();
             me.note = note;
             ajaxGet("/noteContentHistory/listHistories", {noteId: Note.curNoteId}, function(re) {
-                if(!isArray(re)) {
+                if(!isArray(re) || re.length<1) {
                     alert(getMsg('noHistories'));
+                    $tpl.modal('hide');
                     return;
                 }
 

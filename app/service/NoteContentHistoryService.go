@@ -6,6 +6,7 @@ import (
 	//	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
 	"sort"
+	"time"
 )
 
 // 历史记录
@@ -110,4 +111,19 @@ func (this *NoteContentHistoryService) ListHistories(noteId, userId string) []in
 	db.GetByIdAndUserId(db.NoteContentHistories, noteId, userId, &histories)
 	sort.Sort(info.EachHistorySlice(histories.Histories)) // 前端倒着展示，便于理解和操作
 	return histories.Histories
+}
+
+// 删除一条历史；
+// 使用历史记录的时间戳，作为标志进行查找并删除；
+// 实际过程中应该不存在两条时间戳完全相同(时间戳是精确到毫秒级的)历史记录；
+// 如果确实存在两条时间戳毫秒级也相同的，则内容肯定也相同，会一起都删除，目前还没遇到此情况
+func (this *NoteContentHistoryService) DeleteHistory(noteId, userId, timeToDel string) {
+	// 自动解析js返回的RFC 3339格式化时间戳。
+	// golang可以自动解析末尾的Z或者时区偏移
+	t, err := time.Parse(time.RFC3339, timeToDel)
+	if err != nil {
+		return
+	}
+	db.DeleteOneHistory(db.NoteContentHistories, noteId, userId, t)
+	return
 }

@@ -2220,7 +2220,8 @@ textarea#wmd-input {
 .history-modal .modal-dialog .modal-content .modal-body .history-content-wrap .close {
   padding: 10px 15px;
 }
-.history-modal .modal-dialog .modal-content .modal-body .history-content-wrap .back {
+.history-modal .modal-dialog .modal-content .modal-body .history-content-wrap .back,
+.history-modal .modal-dialog .modal-content .modal-body .history-content-wrap .delete {
   margin-left: 10px;
   margin-top: 5px;
 }
