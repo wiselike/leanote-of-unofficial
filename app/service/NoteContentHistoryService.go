@@ -108,6 +108,6 @@ func (this *NoteContentHistoryService) newHistory(noteId, userId string, oneHist
 func (this *NoteContentHistoryService) ListHistories(noteId, userId string) []info.EachHistory {
 	histories := info.NoteContentHistory{}
 	db.GetByIdAndUserId(db.NoteContentHistories, noteId, userId, &histories)
-	sort.Sort(info.EachHistorySlice(histories.Histories)) // TODO 前端倒着展示，就不用排序了
+	sort.Sort(info.EachHistorySlice(histories.Histories)) // 前端倒着展示，便于理解和操作
 	return histories.Histories
 }

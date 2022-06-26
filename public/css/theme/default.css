@@ -2180,7 +2180,7 @@ textarea#wmd-input {
   top: 0;
   bottom: 0;
   overflow-y: auto;
-  width: 200px;
+  width: 220px;
   border-right: 1px solid #ccc;
   box-shadow: 1px 1px 10px #ddd;
 }
@@ -2215,7 +2215,7 @@ textarea#wmd-input {
   top: 0;
   bottom: 0;
   right: 0;
-  left: 200px;
+  left: 220px;
 }
 .history-modal .modal-dialog .modal-content .modal-body .history-content-wrap .close {
   padding: 10px 15px;

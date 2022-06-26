@@ -4,7 +4,6 @@
  * 
  */
 define('history', [], function() {
-
     var tpl = ['<div class="modal fade history-modal" tabindex="-1" role="dialog" aria-hidden="true">',
             '<div class="modal-dialog modal-lg ">',
                 '<div class="modal-content">',
@@ -63,7 +62,7 @@ define('history', [], function() {
             if (list) {
                 for(var i = 0; i < list.length; ++i) {
                     var content = list[i];
-                    navs += '<a class="list-group-item" data-index="' + i + '"><span class="badge">#' + (i+1)+ '</span>' + goNowToDatetime(content.UpdatedTime) + '</a>';
+                    navs += '<a class="list-group-item" data-index="' + i + '"><span class="badge">#' + (list.length-i)+ '</span>' + goNowToDatetime(content.UpdatedTime) + '</a>';
                 }
             }
             $historyList.html(navs);
