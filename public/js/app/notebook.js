@@ -64,6 +64,19 @@ Notebook.getNotebookTitle = function(notebookId) {
 	}
 }
 
+// 鼠标右键菜单的禁用笔记本路径时使用
+Notebook.getNotebookTitlePath = function(notebookId) {
+	var notebook = Notebook.cache[notebookId];
+	if(notebook) {
+		if(notebook.ParentNotebookId=="") {
+			return notebook.Title
+		}
+		return Notebook.getNotebookTitlePath(notebook.ParentNotebookId)+"."+notebook.Title;
+	} else {
+		return "未知";
+	}
+}
+
 /**
  * 我的notebooks
 <ul class="folderBody" id="notebookList">

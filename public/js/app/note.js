@@ -1964,9 +1964,9 @@ Note.initContextmenu = function() {
 				}
 
 				// 移动与复制不能是本notebook下
-				var notebookTitle = Notebook.getNotebookTitle(note.NotebookId);
-				items.push("move." + notebookTitle);
-				items.push("copy." + notebookTitle);
+				var notebookTitlePath = Notebook.getNotebookTitlePath(note.NotebookId);
+				items.push("move." + notebookTitlePath);
+				items.push("copy." + notebookTitlePath);
 			}
 		}
 		// console.log(items);
