@@ -26,7 +26,7 @@ gulp.task('concatDepJs', function() {
         // 'tinymce/tinymce.full.min.js', // 使用打成的包, 加载速度快
         // 'libs/ace/ace.js',
         'js/jQuery-slimScroll-1.3.0/jquery.slimscroll-min.js',
-        'js/contextmenu/jquery.contextmenu-min.js',
+        'js/contextmenu/jquery.contextmenu.js',
         'js/bootstrap-min.js',
         'js/object_id.js',
     ];

@@ -50,8 +50,8 @@ LEA.cmroot = 1;
 					return obj[arguments[1]];
 				});
 			}
-            if (obj.disable) {
-                T.disable = obj.disable;
+            if (obj.disable || (mitems[obj.alias] && mitems[obj.alias].disable)) {
+                T.disable = true;
                 T.className = "b-m-idisable";
             }
             obj.items && (T.group = true);
@@ -210,10 +210,15 @@ LEA.cmroot = 1;
         };
         function disable(alias, disabled) {
             var item = mitems[alias];
-            if(!item || !item.lastChild) {
-            	return;
+            if(!item) {
+                var item = {};
+                item.className = (item.disable = disabled) ? "b-m-idisable" : "b-m-item";
+                mitems[alias] = item;
+                item = null;
+                return;
             }
-            item.className = (item.disable = item.lastChild.disabled = disabled) ? "b-m-idisable" : "b-m-item";
+            // item.className = (item.disable = item.lastChild.disabled = disabled) ? "b-m-idisable" : "b-m-item";
+            item.className = (item.disable = disabled) ? "b-m-idisable" : "b-m-item";
         };
 
         /* to show menu  */
