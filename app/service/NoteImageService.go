@@ -186,10 +186,9 @@ func (this *NoteImageService) OrganizeImageFiles(userId, title, content string) 
 	}
 
 	// 格式化titile
+	title = FixFilename(title)
 	if title == "" {
 		title = "empty-titles-set"
-	} else {
-		title = FixFilename(title)
 	}
 
 	basePath := ConfigS.GlobalStringConfigs["files.dir"]

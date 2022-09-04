@@ -260,10 +260,9 @@ func (this *AttachService) OrganizeAttachFiles(userId, title, content string) (r
 	}
 
 	// 格式化titile
+	title = FixFilename(title)
 	if title == "" {
 		title = "empty-titles-set"
-	} else {
-		title = FixFilename(title)
 	}
 
 	basePath := ConfigS.GlobalStringConfigs["files.dir"]
