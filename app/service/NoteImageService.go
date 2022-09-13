@@ -6,6 +6,7 @@ import (
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
+	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -132,7 +133,6 @@ func (this *NoteImageService) CopyNoteImages(fromNoteId, fromUserId, newNoteId, 
 	return content
 }
 
-//
 func (this *NoteImageService) getImagesByNoteIds(noteIds []bson.ObjectId) map[string][]info.File {
 	noteNoteImages := []info.NoteImage{}
 	db.ListByQ(db.NoteImages, bson.M{"NoteId": bson.M{"$in": noteIds}}, &noteNoteImages)
@@ -252,8 +252,11 @@ func (this *NoteImageService) ReOrganizeImageFiles(userId, noteId, title, conten
 	}
 
 	if oldDir := this.OrganizeImageFiles(userId, title, content); oldDir != "" {
-		// 删旧文件夹
-		os.RemoveAll(oldDir)
+		// 删旧的空文件夹，如果仅部分文件移动，不应删除整个文件夹，因为可能发生从其他笔记里拷贝
+		dir, _ := ioutil.ReadDir(oldDir)
+		if len(dir) == 0 {
+			os.RemoveAll(oldDir)
+		}
 	}
 	return true
 }

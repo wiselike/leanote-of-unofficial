@@ -6,6 +6,7 @@ import (
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"gopkg.in/mgo.v2/bson"
+	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -326,8 +327,11 @@ func (this *AttachService) ReOrganizeAttachFiles(userId, noteId, title, content 
 	}
 
 	if oldDir := this.OrganizeAttachFiles(userId, title, content); oldDir != "" {
-		// 删旧文件夹
-		os.RemoveAll(oldDir)
+		// 删旧的空文件夹，如果仅部分文件移动，不应删除整个文件夹，因为可能发生从其他笔记里拷贝
+		dir, _ := ioutil.ReadDir(oldDir)
+		if len(dir) == 0 {
+			os.RemoveAll(oldDir)
+		}
 	}
 	return true
 }
