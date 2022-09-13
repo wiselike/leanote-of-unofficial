@@ -149,6 +149,6 @@ func (c ApiUser) uploadImage() (ok bool, msg, url string) {
 	}
 
 	ok = true
-	url = configService.GetSiteUrl() + "/" + fileUrlPath + "/" + filename
+	url = "/" + fileUrlPath + "/" + filename
 	return
 }
