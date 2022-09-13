@@ -24,18 +24,18 @@ function ajaxPost(url, param, func) {
 	$.post(url, param, func);
 }
 function goLogin(){ 
-	var loginUrl = urlPrefix + '/login?from=' + encodeURI(location.href);
+	var loginUrl = '/login?from=' + encodeURI(location.href);
 	location.href = loginUrl;
 }
 function goRegister() {
-	var registerUrl = urlPrefix + '/register?from=' + encodeURI(location.href);
+	var registerUrl = '/register?from=' + encodeURI(location.href);
 	location.href = registerUrl;
 }
 function needLogin() {
 	if(typeof visitUserInfo == "undefined" || !visitUserInfo || !visitUserInfo.UserId) {
 		// 弹框之
-		var loginUrl = urlPrefix + '/login?from=' + encodeURI(location.href);
-		var registerUrl = urlPrefix + '/register?from=' + encodeURI(location.href);
+		var loginUrl = '/login?from=' + encodeURI(location.href);
+		var registerUrl = '/register?from=' + encodeURI(location.href);
 		var modal = BootstrapDialog.show({
 	        title: "你还未登录",
 	        message: '<div class="needLogin" style="border:none"><a href="' + loginUrl + '">立即登录</a>, 发表评论.<br />没有帐号? <a href="' + registerUrl +'">立即注册</a>',

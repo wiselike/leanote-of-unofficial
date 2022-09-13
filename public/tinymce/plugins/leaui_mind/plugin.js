@@ -142,8 +142,7 @@ tinymce.PluginManager.add('leaui_mind', function(editor, url) {
 								(function(data) {
 									ajaxPost("/file/copyImage", {userId: UserInfo.UserId, fileId: fileId, toUserId: curNote.UserId}, function(re) {
 										if(reIsOk(re) && re.Id) {
-											var urlPrefix = UrlPrefix; // window.location.protocol + "//" + window.location.host;
-											data.src = urlPrefix + "/file/outputImage?fileId=" + re.Id;
+											data.src = "/file/outputImage?fileId=" + re.Id;
 										}
 										renderImage(data);
 									});
