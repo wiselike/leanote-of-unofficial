@@ -63,10 +63,12 @@
 	}
 
 	function expose(ids) {
-		for (var i = 0; i < ids.length; i++) {
-			var target = exports;
-			var id = ids[i];
-			var fragments = id.split(/[.\/]/);
+		var i, target, id, fragments, privateModules;
+
+		for (i = 0; i < ids.length; i++) {
+			target = exports;
+			id = ids[i];
+			fragments = id.split(/[.\/]/);
 
 			for (var fi = 0; fi < fragments.length - 1; ++fi) {
 				if (target[fragments[fi]] === undefined) {
@@ -78,9 +80,24 @@
 
 			target[fragments[fragments.length - 1]] = modules[id];
 		}
+
+		// Expose private modules for unit tests
+		if (exports.AMDLC_TESTS) {
+			privateModules = exports.privateModules || {};
+
+			for (id in modules) {
+				privateModules[id] = modules[id];
+			}
+
+			for (i = 0; i < ids.length; i++) {
+				delete privateModules[ids[i]];
+			}
+
+			exports.privateModules = privateModules;
+		}
 	}
 
-// Included from: js/tinymce/plugins/spellchecker/classes/DomTextMatcher.js
+// Included from: plugins/spellchecker/classes/DomTextMatcher.js
 
 /**
  * DomTextMatcher.js
@@ -553,7 +570,7 @@ define("tinymce/spellcheckerplugin/DomTextMatcher", [], function() {
 	};
 });
 
-// Included from: js/tinymce/plugins/spellchecker/classes/Plugin.js
+// Included from: plugins/spellchecker/classes/Plugin.js
 
 /**
  * Plugin.js
@@ -993,4 +1010,4 @@ define("tinymce/spellcheckerplugin/Plugin", [
 });
 
 expose(["tinymce/spellcheckerplugin/DomTextMatcher"]);
-})(this);
+})(window);

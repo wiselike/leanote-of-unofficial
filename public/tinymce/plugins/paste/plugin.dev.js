@@ -36,6 +36,10 @@
 	}
 
 	function resolve(id) {
+		if (exports.privateModules && id in exports.privateModules) {
+			return;
+		}
+
 		var target = exports;
 		var fragments = id.split(/[.\/]/);
 
@@ -66,6 +70,8 @@
 	}
 
 	function define(id, dependencies, definition) {
+		var privateModules, i;
+
 		if (typeof id !== 'string') {
 			throw 'invalid module definition, module id must be defined and be a string';
 		}
@@ -83,10 +89,26 @@
 		});
 
 		if (--moduleCount === 0) {
-			for (var i = 0; i < exposedModules.length; i++) {
+			for (i = 0; i < exposedModules.length; i++) {
 				register(exposedModules[i]);
 			}
 		}
+
+		// Expose private modules for unit tests
+		if (exports.AMDLC_TESTS) {
+			privateModules = exports.privateModules || {};
+
+			for (id in modules) {
+				privateModules[id] = modules[id];
+			}
+
+			for (i = 0; i < exposedModules.length; i++) {
+				delete privateModules[exposedModules[i]];
+			}
+
+			exports.privateModules = privateModules;
+		}
+
 	}
 
 	function expose(ids) {
@@ -117,4 +139,4 @@
 	writeScripts();
 })(this);
 
-// $hash: ffd77a8423e40c34b0b8ff089b254d8f
+// $hash: a6f68853a58d48bee626dea554509a3c
