@@ -2050,7 +2050,7 @@ var Attach = {
 			e.stopPropagation();
 			var attachId = $(this).closest('li').data("id");
 			var attach = self.attachsMap[attachId];
-			var src = UrlPrefix + "/api/file/getAttach?fileId=" + attachId;
+			var src = "/api/file/getAttach?fileId=" + attachId;
 			Note.toggleWriteable();
 			if(LEA.isMarkdownEditor() && MD) {
 				MD.insertLink(src, attach.Title);
@@ -2068,7 +2068,7 @@ var Attach = {
 			if(!note) {
 				return;
 			}
-			var src = UrlPrefix +  "/attach/downloadAll?noteId=" + Note.curNoteId
+			var src = "/attach/downloadAll?noteId=" + Note.curNoteId
 			var title = note.Title ? note.Title + ".tar.gz" : "all.tar.gz";
 			
 			if(LEA.isMarkdownEditor() && MD) {

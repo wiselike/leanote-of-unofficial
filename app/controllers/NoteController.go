@@ -359,29 +359,19 @@ func (c Note) ToPdf(noteId, appKey string) revel.Result {
 	// 将content的图片转换为base64
 	contentStr := content.Content
 
-	siteUrlPattern := configService.GetSiteUrl()
-	if strings.Contains(siteUrlPattern, "https") {
-		siteUrlPattern = strings.Replace(siteUrlPattern, "https", "https*", 1)
-	} else {
-		siteUrlPattern = strings.Replace(siteUrlPattern, "http", "https*", 1)
-	}
-
-	siteUrlPattern = "(?:" + siteUrlPattern + ")*"
-
-	regImage, _ := regexp.Compile(`<img .*?(src=('|")` + siteUrlPattern + `/(file/outputImage|api/file/getImage)\?fileId=([a-z0-9A-Z]+)("|'))`)
+	regImage, _ := regexp.Compile(`<img .*?(src=('|")\s*/(file/outputImage|api/file/getImage)\?fileId=([a-z0-9A-Z]+)("|'))`)
 
 	findsImage := regImage.FindAllStringSubmatch(contentStr, -1) // 查找所有的
 	//	[<img src="http://leanote.com/api/getImage?fileId=3354672e8d38f411286b000069" alt="" width="692" height="302" data-mce-src="http://leanote.com/file/outputImage?fileId=54672e8d38f411286b000069" src="http://leanote.com/file/outputImage?fileId=54672e8d38f411286b000069" " file/outputImage 54672e8d38f411286b000069 "]
 	for _, eachFind := range findsImage {
-		if len(eachFind) == 6 {
-			fileId := eachFind[4]
+		if len(eachFind) == 5 {
+			fileId := eachFind[3]
 			// 得到base64编码文件
 			fileBase64 := fileService.GetImageBase64(noteUserId, fileId)
 			if fileBase64 == "" {
 				continue
 			}
 
-			// 1
 			// src="http://leanote.com/file/outputImage?fileId=54672e8d38f411286b000069"
 			allFixed := strings.Replace(eachFind[0], eachFind[1], "src=\""+fileBase64+"\"", -1)
 			contentStr = strings.Replace(contentStr, eachFind[0], allFixed, -1)
@@ -391,18 +381,17 @@ func (c Note) ToPdf(noteId, appKey string) revel.Result {
 	// markdown
 	if note.IsMarkdown {
 		// ![enter image description here](url)
-		regImageMarkdown, _ := regexp.Compile(`!\[.*?\]\(` + siteUrlPattern + `/(file/outputImage|api/file/getImage)\?fileId=([a-z0-9A-Z]+)\)`)
+		regImageMarkdown, _ := regexp.Compile(`!\[.*?\]\(\s*/(file/outputImage|api/file/getImage)\?fileId=([a-z0-9A-Z]+)\)`)
 		findsImageMarkdown := regImageMarkdown.FindAllStringSubmatch(contentStr, -1) // 查找所有的
 		for _, eachFind := range findsImageMarkdown {
-			if len(eachFind) == 3 {
-				fileId := eachFind[2]
+			if len(eachFind) == 2 {
+				fileId := eachFind[1]
 				// 得到base64编码文件
 				fileBase64 := fileService.GetImageBase64(noteUserId, fileId)
 				if fileBase64 == "" {
 					continue
 				}
 
-				// 1
 				// src="http://leanote.com/file/outputImage?fileId=54672e8d38f411286b000069"
 				allFixed := "![](" + fileBase64 + ")"
 				contentStr = strings.Replace(contentStr, eachFind[0], allFixed, -1)

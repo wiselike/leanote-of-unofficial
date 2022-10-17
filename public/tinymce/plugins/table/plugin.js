@@ -63,10 +63,12 @@
 	}
 
 	function expose(ids) {
-		for (var i = 0; i < ids.length; i++) {
-			var target = exports;
-			var id = ids[i];
-			var fragments = id.split(/[.\/]/);
+		var i, target, id, fragments, privateModules;
+
+		for (i = 0; i < ids.length; i++) {
+			target = exports;
+			id = ids[i];
+			fragments = id.split(/[.\/]/);
 
 			for (var fi = 0; fi < fragments.length - 1; ++fi) {
 				if (target[fragments[fi]] === undefined) {
@@ -78,9 +80,24 @@
 
 			target[fragments[fragments.length - 1]] = modules[id];
 		}
+
+		// Expose private modules for unit tests
+		if (exports.AMDLC_TESTS) {
+			privateModules = exports.privateModules || {};
+
+			for (id in modules) {
+				privateModules[id] = modules[id];
+			}
+
+			for (i = 0; i < ids.length; i++) {
+				delete privateModules[ids[i]];
+			}
+
+			exports.privateModules = privateModules;
+		}
 	}
 
-// Included from: js/tinymce/plugins/table/classes/TableGrid.js
+// Included from: plugins/table/classes/TableGrid.js
 
 /**
  * TableGrid.js
@@ -947,7 +964,7 @@ define("tinymce/tableplugin/TableGrid", [
 	};
 });
 
-// Included from: js/tinymce/plugins/table/classes/Quirks.js
+// Included from: plugins/table/classes/Quirks.js
 
 /**
  * Quirks.js
@@ -1322,7 +1339,7 @@ define("tinymce/tableplugin/Quirks", [
 	};
 });
 
-// Included from: js/tinymce/plugins/table/classes/CellSelection.js
+// Included from: plugins/table/classes/CellSelection.js
 
 /**
  * CellSelection.js
@@ -1501,7 +1518,7 @@ define("tinymce/tableplugin/CellSelection", [
 	};
 });
 
-// Included from: js/tinymce/plugins/table/classes/Dialogs.js
+// Included from: plugins/table/classes/Dialogs.js
 
 /**
  * Dialogs.js
@@ -2328,7 +2345,7 @@ define("tinymce/tableplugin/Dialogs", [
 	};
 });
 
-// Included from: js/tinymce/plugins/table/classes/Plugin.js
+// Included from: plugins/table/classes/Plugin.js
 
 /**
  * Plugin.js
@@ -2766,4 +2783,4 @@ define("tinymce/tableplugin/Plugin", [
 
 	PluginManager.add('table', Plugin);
 });
-})(this);
+})(window);

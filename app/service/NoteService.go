@@ -1041,7 +1041,7 @@ func (this *NoteService) FixContentBad(content string, isMarkdown bool) string {
 					// 这一行会非常慢!, content是全部的内容, 多次replace导致
 					content = strings.Replace(content,
 						eachFind[1],
-						eachPattern["src"]+"=\""+baseUrl+"/api/file/"+eachPattern["to"]+eachFind[2]+"\"",
+						eachPattern["src"]+"=\""+"/api/file/"+eachPattern["to"]+eachFind[2]+"\"",
 						1)
 				}
 			}
@@ -1063,7 +1063,7 @@ func (this *NoteService) FixContentBad(content string, isMarkdown bool) string {
 			for _, eachFind := range findsImageMarkdown {
 				// [![你好啊, 我很好, 为什么?](http://leanote.com/file/outputImage?fileId=5503537b38f4111dcb0000d1) 你好啊, 我很好, 为什么? 5503537b38f4111dcb0000d1]
 				if len(eachFind) == 3 {
-					content = strings.Replace(content, eachFind[0], pre+"["+eachFind[1]+"]("+baseUrl+"/api/file/"+eachPattern["to"]+eachFind[2]+")", 1)
+					content = strings.Replace(content, eachFind[0], pre+"["+eachFind[1]+"]("+"/api/file/"+eachPattern["to"]+eachFind[2]+")", 1)
 				}
 			}
 		}
@@ -1129,7 +1129,7 @@ func (this *NoteService) FixContent(content string, isMarkdown bool) string {
 				eachFind := reg2.FindStringSubmatch(str)
 				str = strings.Replace(str,
 					eachFind[1],
-					eachPattern["src"]+"=\""+baseUrl+"/api/file/"+eachPattern["to"]+eachFind[2]+"\"",
+					eachPattern["src"]+"=\""+"/api/file/"+eachPattern["to"]+eachFind[2]+"\"",
 					1)
 
 				// fmt.Println(str)
@@ -1168,7 +1168,7 @@ func (this *NoteService) FixContent(content string, isMarkdown bool) string {
 				// <img src="http://localhost:9000/file/outputImage?fileId=563d706e99c37b48e0000001" alt="" data-mce-src="http://localhost:9000/file/outputImage?fileId=563d706e99c37b48e0000002">
 
 				eachFind := regImageMarkdown2.FindStringSubmatch(str)
-				str = strings.Replace(str, eachFind[0], pre+"["+eachFind[1]+"]("+baseUrl+"/api/file/"+eachPattern["to"]+eachFind[2]+")", 1)
+				str = strings.Replace(str, eachFind[0], pre+"["+eachFind[1]+"]("+"/api/file/"+eachPattern["to"]+eachFind[2]+")", 1)
 
 				// fmt.Println(str)
 				return str

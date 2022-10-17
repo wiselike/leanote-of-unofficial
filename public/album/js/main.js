@@ -271,7 +271,7 @@ var o = {
 				if(each.Path != "" && each.Path.substr(0, 7) == "upload/") {
 					var src = urlPrefix + "/" + each.Path;
 				} else {
-					var src = urlPrefix + "/api/file/getImage?fileId=" + each.FileId;
+					var src = "/api/file/getImage?fileId=" + each.FileId;
 				}
 				// log(src);
 				if(selectedMap[src]) {
@@ -370,7 +370,7 @@ var o = {
 				src = $li;
 			} else {
 				// 来自内部
-				src = urlPrefix + "/api/file/getImage?fileId=" + $li;
+				src = "/api/file/getImage?fileId=" + $li;
 			}
 		}
 		

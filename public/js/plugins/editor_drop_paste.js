@@ -99,8 +99,15 @@ define('editor_drop_paste', ['fileupload'], function() {
 			imgElm = dom.get(d.id);
 			
 			function callback (wh) {
+				// 这里, 如果图片宽度过大, 这里设置成500px
+				if(wh && wh.width) {
+					if(wh.width > 600) {
+						wh.width = 600;
+					}
+					data2.width = wh.width;
+					dom.setAttrib(imgElm, 'width', data2.width);
+				}
 				dom.setAttrib(imgElm, 'src', data2.src);
-				// dom.setAttrib(imgElm, 'width', data2.width);
 				if(data2.title) {
 					dom.setAttrib(imgElm, 'title', data2.title);
 				}

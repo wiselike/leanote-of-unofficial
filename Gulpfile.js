@@ -330,18 +330,17 @@ gulp.task('concatAlbumJs', function() {
 
 // tinymce
 // please set the right path on your own env
-/*
-var tinymceBase = '/Users/life/leanote/leanote-tools/tinymce_4.1.9_leanote_public';
+var tinymceBase = base+'/tinymce';
 gulp.task('tinymce', function() {
     // 先清理
-    fs.unlink(tinymceBase + '/js/tinymce/tinymce.dev.js');
-    fs.unlink(tinymceBase + '/js/tinymce/tinymce.jquery.dev.js');
-    fs.unlink(tinymceBase + '/js/tinymce/tinymce.full.js');
-    fs.unlink(tinymceBase + '/js/tinymce/tinymce.full.min.js');
+    fs.unlink(tinymceBase + '/tinymce.dev.js', (err => {}));
+    fs.unlink(tinymceBase + '/tinymce.jquery.dev.js', (err => {}));
+    fs.unlink(tinymceBase + '/tinymce.full.js', (err => {}));
+    fs.unlink(tinymceBase + '/tinymce.full.min.js', (err => {}));
 
     var cp = require('child_process');
 
-    var bundleCmd = 'grunt bundle --themes leanote --plugins autolink,link,leaui_image,leaui_mindmap,lists,hr,paste,searchreplace,leanote_nav,leanote_code,tabfocus,table,directionality,textcolor';
+    var bundleCmd = 'grunt bundle --themes=leanote --plugins=autolink,link,leaui_image,leaui_mindmap,lists,hr,paste,searchreplace,leanote_nav,leanote_code,tabfocus,table,directionality,textcolor';
     // build
     cp.exec('grunt minify', {cwd: tinymceBase}, function(err, stdout, stderr) {
         console.log('stdout: ' + stdout);
@@ -354,7 +353,6 @@ gulp.task('tinymce', function() {
         });
     });
 });
-*/
 
 // 合并css, 无用
 // Deprecated
@@ -408,4 +406,4 @@ gulp.task('minifycss', function() {
 
 gulp.task('concat', ['concatDepJs', 'concatAppJs', /* 'concatMarkdownJs', */'concatMarkdownJsV2']);
 gulp.task('html', ['devToProHtml']);
-gulp.task('default', ['concat', 'plugins', 'minifycss', 'i18n', 'concatAlbumJs', 'html']);
+gulp.task('default', ['concat', 'plugins', 'minifycss', 'tinymce', 'i18n', 'concatAlbumJs', 'html']);

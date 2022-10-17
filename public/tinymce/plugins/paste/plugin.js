@@ -63,10 +63,12 @@
 	}
 
 	function expose(ids) {
-		for (var i = 0; i < ids.length; i++) {
-			var target = exports;
-			var id = ids[i];
-			var fragments = id.split(/[.\/]/);
+		var i, target, id, fragments, privateModules;
+
+		for (i = 0; i < ids.length; i++) {
+			target = exports;
+			id = ids[i];
+			fragments = id.split(/[.\/]/);
 
 			for (var fi = 0; fi < fragments.length - 1; ++fi) {
 				if (target[fragments[fi]] === undefined) {
@@ -78,9 +80,24 @@
 
 			target[fragments[fragments.length - 1]] = modules[id];
 		}
+
+		// Expose private modules for unit tests
+		if (exports.AMDLC_TESTS) {
+			privateModules = exports.privateModules || {};
+
+			for (id in modules) {
+				privateModules[id] = modules[id];
+			}
+
+			for (i = 0; i < ids.length; i++) {
+				delete privateModules[ids[i]];
+			}
+
+			exports.privateModules = privateModules;
+		}
 	}
 
-// Included from: js/tinymce/plugins/paste/classes/Utils.js
+// Included from: plugins/paste/classes/Utils.js
 
 /**
  * Utils.js
@@ -181,7 +198,7 @@ define("tinymce/pasteplugin/Utils", [
 	};
 });
 
-// Included from: js/tinymce/plugins/paste/classes/Clipboard.js
+// Included from: plugins/paste/classes/Clipboard.js
 
 // Included from: js/tinymce/plugins/paste/classes/Clipboard.js
 
@@ -233,7 +250,7 @@ define("tinymce/pasteplugin/Clipboard", [
 				if(reIsOk(ret)) {
 					// 将图片替换之
 					// var src = urlPrefix + "/" + ret.Item;
-					var src = urlPrefix + "/api/file/getImage?fileId=" + ret.Id;
+					var src = "/file/outputImage?fileId=" + ret.Id;
 					var dom = editor.dom;
 					for(var i in ids) {
 						var id = ids[i];
@@ -306,7 +323,7 @@ define("tinymce/pasteplugin/Clipboard", [
 									var $img = $imgs.eq(i)
 									var src = $img.attr("src");
 									// 是否是外链
-									if(src.indexOf(urlPrefix) == -1) {
+									if(src.indexOf(urlPrefix) == -1 && src[0]!='/') {
 										time++;
 										var id = "__LEANOTE_IMAGE_" + time;
 										$img.attr("id", id);
@@ -592,7 +609,7 @@ define("tinymce/pasteplugin/Clipboard", [
 				    		}
 				    		// 这里, 如果图片宽度过大, 这里设置成500px
 							var urlPrefix = UrlPrefix; // window.location.protocol + "//" + window.location.host;
-							var src = urlPrefix + "/file/outputImage?fileId=" + re.Id;
+							var src = "/file/outputImage?fileId=" + re.Id;
 							getImageSize(src, function(wh) {
 								// life 4/25
 								if(wh && wh.width) {
@@ -621,8 +638,6 @@ define("tinymce/pasteplugin/Clipboard", [
 			
 			if (hasImage(e)) {
 				removePasteBin();
-				// 不然会在内容中插入一个图片, 
-				e.preventDefault();
 				return;
 			}
 
@@ -683,7 +698,7 @@ define("tinymce/pasteplugin/Clipboard", [
 	};
 });
 
-// Included from: js/tinymce/plugins/paste/classes/WordFilter.js
+// Included from: plugins/paste/classes/WordFilter.js
 
 /**
  * WordFilter.js
@@ -949,7 +964,7 @@ define("tinymce/pasteplugin/WordFilter", [
 	return WordFilter;
 });
 
-// Included from: js/tinymce/plugins/paste/classes/Quirks.js
+// Included from: plugins/paste/classes/Quirks.js
 
 /**
  * Quirks.js
@@ -1075,7 +1090,7 @@ define("tinymce/pasteplugin/Quirks", [
 	};
 });
 
-// Included from: js/tinymce/plugins/paste/classes/Plugin.js
+// Included from: plugins/paste/classes/Plugin.js
 
 /**
  * Plugin.js
@@ -1191,4 +1206,4 @@ define("tinymce/pasteplugin/Plugin", [
 });
 
 expose(["tinymce/pasteplugin/Utils","tinymce/pasteplugin/WordFilter"]);
-})(this);
+})(window);
