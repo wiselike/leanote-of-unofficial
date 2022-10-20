@@ -328,6 +328,7 @@ gulp.task('concatAlbumJs', function() {
         .pipe(gulp.dest(base + '/album/js'));
 });
 
+/*
 // tinymce
 // please set the right path on your own env
 var tinymceBase = base+'/tinymce';
@@ -353,6 +354,7 @@ gulp.task('tinymce', function() {
         });
     });
 });
+*/
 
 // 合并css, 无用
 // Deprecated
@@ -406,4 +408,4 @@ gulp.task('minifycss', function() {
 
 gulp.task('concat', ['concatDepJs', 'concatAppJs', /* 'concatMarkdownJs', */'concatMarkdownJsV2']);
 gulp.task('html', ['devToProHtml']);
-gulp.task('default', ['concat', 'plugins', 'minifycss', 'tinymce', 'i18n', 'concatAlbumJs', 'html']);
+gulp.task('default', ['concat', 'plugins', 'minifycss', /* 'tinymce', */'i18n', 'concatAlbumJs', 'html']);
