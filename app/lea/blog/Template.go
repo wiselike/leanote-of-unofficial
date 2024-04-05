@@ -2,7 +2,7 @@ package blog
 
 import (
 	. "github.com/leanote/leanote/app/lea"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"html/template"
 	"io/ioutil"
 	//	"os"

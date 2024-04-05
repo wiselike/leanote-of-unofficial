@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	//	"encoding/json"
 	//	"gopkg.in/mgo.v2/bson"
 	"github.com/leanote/leanote/app/info"

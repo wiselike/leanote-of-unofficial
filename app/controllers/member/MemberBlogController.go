@@ -5,7 +5,7 @@ import (
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
 	"github.com/leanote/leanote/app/service"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"io/ioutil"
 	"os"
 	"path"

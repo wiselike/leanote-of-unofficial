@@ -15,7 +15,7 @@ import (
 	"os"
 //	"strings"
 //	"time"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"code.google.com/p/go.net/html"
 	"strings"
 	"strconv"

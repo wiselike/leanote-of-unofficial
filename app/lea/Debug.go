@@ -3,7 +3,7 @@ package lea
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 )
 
 func Log(msg string, i ...interface{}) {

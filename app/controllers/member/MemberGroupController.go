@@ -2,7 +2,7 @@ package member
 
 import (
 	"github.com/leanote/leanote/app/info"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 )
 
 // 分组管理

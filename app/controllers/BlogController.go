@@ -3,7 +3,7 @@ package controllers
 import (
 	"strings"
 
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 
 	//	"encoding/json"
 	"fmt"

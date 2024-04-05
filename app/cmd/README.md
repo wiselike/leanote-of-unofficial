@@ -1,4 +1,4 @@
-全部代码来自https://github.com/revel/cmd
+全部代码来自https://github.com/wiselike/revel-cmd
 
 因为要改parse2, 所以改只要一点点代码
 harness/

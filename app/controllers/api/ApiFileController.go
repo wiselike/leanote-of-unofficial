@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/leanote/leanote/app/service"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	//	"encoding/json"
 	//	. "github.com/leanote/leanote/app/lea"
 	//	"gopkg.in/mgo.v2/bson"

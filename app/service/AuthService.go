@@ -4,7 +4,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	//	"github.com/leanote/leanote/app/db"
 	"github.com/leanote/leanote/app/info"
-	//	"github.com/revel/revel"
+	//	"github.com/wiselike/revel"
 	"errors"
 	"fmt"
 	. "github.com/leanote/leanote/app/lea"

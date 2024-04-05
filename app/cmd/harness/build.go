@@ -19,10 +19,10 @@ import (
 	"time"
 
 	"github.com/leanote/leanote/app/cmd/parser2"
-	"github.com/revel/cmd/model"
-	"github.com/revel/cmd/parser"
-	_ "github.com/revel/cmd/parser"
-	"github.com/revel/cmd/utils"
+	"github.com/wiselike/revel-cmd/model"
+	"github.com/wiselike/revel-cmd/parser"
+	_ "github.com/wiselike/revel-cmd/parser"
+	"github.com/wiselike/revel-cmd/utils"
 )
 
 var importErrorPattern = regexp.MustCompile("cannot find package \"([^\"]+)\"")
@@ -466,9 +466,9 @@ package run
 
 import (
 	"reflect"
-	"github.com/revel/revel"{{range $k, $v := $.ImportPaths}}
+	"github.com/wiselike/revel"{{range $k, $v := $.ImportPaths}}
 	{{$v}} "{{$k}}"{{end}}
-	"github.com/revel/revel/testing"
+	"github.com/wiselike/revel/testing"
 )
 
 var (
@@ -521,7 +521,7 @@ package main
 import (
 	"flag"
 	"{{.ImportPath}}/app/tmp/run"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 )
 
 var (
@@ -545,7 +545,7 @@ const RevelRoutesTemplate = `// GENERATED CODE - DO NOT EDIT
 // found in all the controllers.
 package routes
 
-import "github.com/revel/revel"
+import "github.com/wiselike/revel"
 
 {{range $i, $c := .Controllers}}
 type t{{.StructName}} struct {}

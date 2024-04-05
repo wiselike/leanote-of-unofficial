@@ -2,7 +2,7 @@ package route
 
 import (
 	"github.com/leanote/leanote/app/db"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	// . "github.com/leanote/leanote/app/lea"
 	"net/url"
 	"strings"

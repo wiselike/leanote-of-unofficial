@@ -6,7 +6,7 @@ import (
 	. "github.com/leanote/leanote/app/lea"
 	"github.com/leanote/leanote/app/lea/netutil"
 	"github.com/leanote/leanote/app/service"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"os"

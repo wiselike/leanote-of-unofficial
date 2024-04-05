@@ -5,7 +5,7 @@ import (
 	"github.com/leanote/leanote/app/lea/blog"
 	"github.com/leanote/leanote/app/service"
 	//	. "github.com/leanote/leanote/app/lea"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"strings"
 )
 

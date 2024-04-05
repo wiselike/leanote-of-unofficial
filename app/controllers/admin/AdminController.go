@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 )
 
 // admin 首页

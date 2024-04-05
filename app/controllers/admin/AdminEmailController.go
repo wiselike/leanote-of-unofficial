@@ -3,7 +3,7 @@ package admin
 import (
 	"github.com/leanote/leanote/app/info"
 	. "github.com/leanote/leanote/app/lea"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"strconv"
 	"strings"
 )

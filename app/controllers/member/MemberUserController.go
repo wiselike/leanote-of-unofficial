@@ -1,7 +1,7 @@
 package member
 
 import (
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 )
 
 // 帐户信息

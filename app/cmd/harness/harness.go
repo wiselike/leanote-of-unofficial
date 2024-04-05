@@ -30,9 +30,9 @@ import (
 	"time"
 
 	"encoding/json"
-	"github.com/revel/cmd/model"
-	"github.com/revel/cmd/utils"
-	"github.com/revel/cmd/watcher"
+	"github.com/wiselike/revel-cmd/model"
+	"github.com/wiselike/revel-cmd/utils"
+	"github.com/wiselike/revel-cmd/watcher"
 	"html/template"
 	"io/ioutil"
 	"sync"

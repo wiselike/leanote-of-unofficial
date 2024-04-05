@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/leanote/leanote/app/info"
 	"github.com/leanote/leanote/app/lea/i18n"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"gopkg.in/mgo.v2/bson"
 	//	. "github.com/leanote/leanote/app/lea"
 	//	"io/ioutil"

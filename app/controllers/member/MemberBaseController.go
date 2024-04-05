@@ -1,7 +1,7 @@
 package member
 
 import (
-	//	"github.com/revel/revel"
+	//	"github.com/wiselike/revel"
 	//	"gopkg.in/mgo.v2/bson"
 	//	"encoding/json"
 	"github.com/leanote/leanote/app/controllers"

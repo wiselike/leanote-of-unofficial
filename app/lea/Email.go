@@ -1,7 +1,7 @@
 package lea
 
 import (
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"net/smtp"
 	"strings"
 )

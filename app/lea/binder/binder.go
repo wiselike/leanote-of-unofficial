@@ -2,7 +2,7 @@ package binder
 
 import (
 	"github.com/leanote/leanote/app/info"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	//	"github.com/leanote/leanote/app/controllers/api"
 	"fmt"
 	"reflect"

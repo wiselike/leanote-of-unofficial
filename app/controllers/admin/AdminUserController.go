@@ -2,7 +2,7 @@ package admin
 
 import (
 	. "github.com/leanote/leanote/app/lea"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	//	"time"
 	"github.com/leanote/leanote/app/info"
 )

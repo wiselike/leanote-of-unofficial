@@ -13,7 +13,7 @@ import (
 	"github.com/leanote/leanote/app/lea/i18n"
 	"github.com/leanote/leanote/app/lea/route"
 	"github.com/leanote/leanote/app/service"
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	"html/template"
 	"math"
 	"net/url"

@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/revel/revel"
+	"github.com/wiselike/revel"
 	//	"encoding/json"
 	"archive/tar"
 	"compress/gzip"
