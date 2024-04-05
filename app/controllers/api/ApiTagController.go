@@ -1,10 +1,10 @@
 package api
 
 import (
-	"github.com/leanote/leanote/app/info"
+	"github.com/wiselike/leanote-of-unofficial/app/info"
 	"github.com/wiselike/revel"
 	//	"gopkg.in/mgo.v2/bson"
-	//	. "github.com/leanote/leanote/app/lea"
+	//	. "github.com/wiselike/leanote-of-unofficial/app/lea"
 	//	"io/ioutil"
 )
 

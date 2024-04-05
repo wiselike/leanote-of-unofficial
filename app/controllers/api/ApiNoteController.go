@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"github.com/leanote/leanote/app/service"
+	"github.com/wiselike/leanote-of-unofficial/app/info"
+	. "github.com/wiselike/leanote-of-unofficial/app/lea"
+	"github.com/wiselike/leanote-of-unofficial/app/service"
 	"github.com/wiselike/revel"
 	"gopkg.in/mgo.v2/bson"
 	"os"
@@ -11,7 +11,7 @@ import (
 	"path"
 	"regexp"
 	"time"
-	//	"github.com/leanote/leanote/app/types"
+	//	"github.com/wiselike/leanote-of-unofficial/app/types"
 )
 
 // 笔记API

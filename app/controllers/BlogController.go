@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/leanote/leanote/app/info"
+	"github.com/wiselike/leanote-of-unofficial/app/info"
 
-	// . "github.com/leanote/leanote/app/lea"
-	"github.com/leanote/leanote/app/lea/blog"
+	// . "github.com/wiselike/leanote-of-unofficial/app/lea"
+	"github.com/wiselike/leanote-of-unofficial/app/lea/blog"
 	"gopkg.in/mgo.v2/bson"
-	//	"github.com/leanote/leanote/app/types"
+	//	"github.com/wiselike/leanote-of-unofficial/app/types"
 	//	"io/ioutil"
 	//	"math"
 	//	"os"

@@ -3,9 +3,9 @@ package admin
 import (
 	"archive/tar"
 	"compress/gzip"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"github.com/leanote/leanote/app/service"
+	"github.com/wiselike/leanote-of-unofficial/app/info"
+	. "github.com/wiselike/leanote-of-unofficial/app/lea"
+	"github.com/wiselike/leanote-of-unofficial/app/service"
 	"github.com/wiselike/revel"
 	"io"
 	"os"

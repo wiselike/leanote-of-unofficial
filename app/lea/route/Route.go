@@ -1,9 +1,9 @@
 package route
 
 import (
-	"github.com/leanote/leanote/app/db"
+	"github.com/wiselike/leanote-of-unofficial/app/db"
 	"github.com/wiselike/revel"
-	// . "github.com/leanote/leanote/app/lea"
+	// . "github.com/wiselike/leanote-of-unofficial/app/lea"
 	"net/url"
 	"strings"
 )

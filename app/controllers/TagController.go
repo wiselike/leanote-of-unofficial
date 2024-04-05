@@ -4,8 +4,8 @@ import (
 	"github.com/wiselike/revel"
 	//	"encoding/json"
 	//	"gopkg.in/mgo.v2/bson"
-	//	. "github.com/leanote/leanote/app/lea"
-	"github.com/leanote/leanote/app/info"
+	//	. "github.com/wiselike/leanote-of-unofficial/app/lea"
+	"github.com/wiselike/leanote-of-unofficial/app/info"
 	//	"os/exec"
 )
 

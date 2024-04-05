@@ -3,7 +3,7 @@ package admin
 import (
 	"github.com/wiselike/revel"
 	//	"encoding/json"
-	"github.com/leanote/leanote/app/info"
+	"github.com/wiselike/leanote-of-unofficial/app/info"
 	//	"io/ioutil"
 )
 

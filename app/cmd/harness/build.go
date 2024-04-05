@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/leanote/leanote/app/cmd/parser2"
+	"github.com/wiselike/leanote-of-unofficial/app/cmd/parser2"
 	"github.com/wiselike/revel-cmd/model"
 	"github.com/wiselike/revel-cmd/parser"
 	_ "github.com/wiselike/revel-cmd/parser"

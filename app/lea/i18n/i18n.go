@@ -2,7 +2,7 @@ package i18n
 
 import (
 	"fmt"
-	. "github.com/leanote/leanote/app/lea"
+	. "github.com/wiselike/leanote-of-unofficial/app/lea"
 	"github.com/wiselike/revel"
 	"github.com/robfig/config"
 	"os"

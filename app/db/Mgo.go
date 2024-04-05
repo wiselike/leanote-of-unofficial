@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	. "github.com/leanote/leanote/app/lea"
+	. "github.com/wiselike/leanote-of-unofficial/app/lea"
 	"github.com/wiselike/revel"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

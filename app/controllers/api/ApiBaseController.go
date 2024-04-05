@@ -1,10 +1,10 @@
 package api
 
 import (
-	"github.com/leanote/leanote/app/controllers"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"github.com/leanote/leanote/app/service"
+	"github.com/wiselike/leanote-of-unofficial/app/controllers"
+	"github.com/wiselike/leanote-of-unofficial/app/info"
+	. "github.com/wiselike/leanote-of-unofficial/app/lea"
+	"github.com/wiselike/leanote-of-unofficial/app/service"
 	"gopkg.in/mgo.v2/bson"
 	"io/ioutil"
 	"os"

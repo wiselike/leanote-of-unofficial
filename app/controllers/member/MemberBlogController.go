@@ -2,16 +2,16 @@ package member
 
 import (
 	"fmt"
-	"github.com/leanote/leanote/app/info"
-	. "github.com/leanote/leanote/app/lea"
-	"github.com/leanote/leanote/app/service"
+	"github.com/wiselike/leanote-of-unofficial/app/info"
+	. "github.com/wiselike/leanote-of-unofficial/app/lea"
+	"github.com/wiselike/leanote-of-unofficial/app/service"
 	"github.com/wiselike/revel"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
 	"time"
-	//	"github.com/leanote/leanote/app/lea/blog"
+	//	"github.com/wiselike/leanote-of-unofficial/app/lea/blog"
 )
 
 // 博客管理
