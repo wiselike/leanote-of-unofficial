@@ -592,7 +592,7 @@ func (this *ShareService) ListNotebookShareUserInfo(notebookId, userId string) [
 	return shareUserInfos
 }
 
-//----------------
+// ----------------
 // 改变note share权限
 func (this *ShareService) UpdateShareNotePerm(noteId string, perm int, userId, toUserId string) bool {
 	return db.UpdateByQField(db.ShareNotes,
@@ -610,7 +610,7 @@ func (this *ShareService) UpdateShareNotebookPerm(notebookId string, perm int, u
 	)
 }
 
-//---------------
+// ---------------
 // 删除share note
 func (this *ShareService) DeleteShareNote(noteId string, userId, toUserId string) bool {
 	return db.DeleteAll(db.ShareNotes,

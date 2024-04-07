@@ -199,7 +199,7 @@ func (this *ConfigService) IsOpenRegister() bool {
 	return this.GetGlobalStringConfig("openRegister") != ""
 }
 
-//-------
+// -------
 // 修改共享笔记的配置
 func (this *ConfigService) UpdateShareNoteConfig(registerSharedUserId string,
 	registerSharedNotebookPerms, registerSharedNotePerms []int,
@@ -470,7 +470,7 @@ func (this *ConfigService) GetBackup(createdTime string) (map[string]string, boo
 	return backup, true
 }
 
-//--------------
+// --------------
 // sub domain
 var defaultDomain string
 var schema = "http://"

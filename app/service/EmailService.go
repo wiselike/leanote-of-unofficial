@@ -44,7 +44,7 @@ func InitEmailFromDb() {
 	}
 }
 
-//return a smtp client
+// return a smtp client
 func dial(addr string) (*smtp.Client, error) {
 	conn, err := tls.Dial("tcp", addr, nil)
 	if err != nil {

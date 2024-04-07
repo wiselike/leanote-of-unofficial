@@ -88,9 +88,11 @@ type ShareNotebook struct {
 
 /*
 [
+
 	ShareNotebooks,
 		Subs: [ShareNotebooks, ]
 	ShareNotebooks
+
 ]
 */
 type SubShareNotebooks []ShareNotebooks

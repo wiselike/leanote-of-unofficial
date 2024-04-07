@@ -14,7 +14,7 @@ type Auth struct {
 	BaseController
 }
 
-//--------
+// --------
 // 登录
 func (c Auth) Login(email, from string) revel.Result {
 	c.ViewArgs["title"] = c.Message("login")
@@ -108,7 +108,7 @@ func (c Auth) Demo() revel.Result {
 	return nil
 }
 
-//--------
+// --------
 // 注册
 func (c Auth) Register(from, iu string) revel.Result {
 	if !configService.IsOpenRegister() {
@@ -149,7 +149,7 @@ func (c Auth) DoRegister(email, pwd, iu string) revel.Result {
 	return c.RenderRe(re)
 }
 
-//--------
+// --------
 // 找回密码
 func (c Auth) FindPassword() revel.Result {
 	c.SetLocale()

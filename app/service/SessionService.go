@@ -59,7 +59,7 @@ func (this *SessionService) IncrLoginTimes(sessionId string) bool {
 	return this.Update(sessionId, "LoginTimes", session.LoginTimes+1)
 }
 
-//----------
+// ----------
 // 验证码
 func (this *SessionService) GetCaptcha(sessionId string) string {
 	session := this.Get(sessionId)
@@ -74,7 +74,7 @@ func (this *SessionService) SetCaptcha(sessionId, captcha string) bool {
 	return ok
 }
 
-//-----------
+// -----------
 // API
 func (this *SessionService) GetUserId(sessionId string) string {
 	session := this.Get(sessionId)

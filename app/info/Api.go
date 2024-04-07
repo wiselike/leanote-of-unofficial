@@ -6,9 +6,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-//---------
+// ---------
 // 数据结构
-//---------
+// ---------
 type NoteFile struct {
 	FileId      string // 服务器端Id
 	LocalFileId string // 客户端Id
@@ -69,9 +69,9 @@ type ApiUser struct {
 	Logo     string
 }
 
-//----------
+// ----------
 // Notebook
-//----------
+// ----------
 type ApiNotebook struct {
 	NotebookId       bson.ObjectId   `bson:"_id,omitempty"` // 必须要设置bson:"_id" 不然mgo不会认为是主键
 	UserId           bson.ObjectId   `bson:"UserId"`

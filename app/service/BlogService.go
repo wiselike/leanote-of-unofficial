@@ -446,7 +446,7 @@ func (this *BlogService) PreNextBlog(userId string, sorterField string, isAsc bo
 	return this.FixNote(note), this.FixNote(note2)
 }
 
-//-------
+// -------
 // p
 // 平台 lea+
 // 博客列表
@@ -533,7 +533,7 @@ func (this *BlogService) ListAllBlogs(userId, tag string, keywords string, isRec
 	return pageInfo, blogs
 }
 
-//------------------------
+// ------------------------
 // 博客设置
 func (this *BlogService) fixUserBlog(userBlog *info.UserBlog) {
 	// Logo路径问题, 有些有http: 有些没有

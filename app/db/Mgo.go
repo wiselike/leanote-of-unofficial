@@ -249,7 +249,6 @@ func GetNoteHistoriesCount(collection *mgo.Collection, noteId, userId string) in
 	return -1
 }
 
-//
 func UpdateByQField(collection *mgo.Collection, q interface{}, field string, value interface{}) bool {
 	_, err := collection.UpdateAll(q, bson.M{"$set": bson.M{field: value}})
 	return Err(err)

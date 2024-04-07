@@ -325,7 +325,7 @@ func (c Note) CopySharedNote(noteIds []string, notebookId, fromUserId string) re
 	return c.RenderJSON(re)
 }
 
-//------------
+// ------------
 // search
 // 通过title搜索
 func (c Note) SearchNote(key string) revel.Result {

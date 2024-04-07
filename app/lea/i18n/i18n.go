@@ -2,9 +2,9 @@ package i18n
 
 import (
 	"fmt"
+	"github.com/robfig/config"
 	. "github.com/wiselike/leanote-of-unofficial/app/lea"
 	"github.com/wiselike/revel"
-	"github.com/robfig/config"
 	"os"
 	"path/filepath"
 	"regexp"

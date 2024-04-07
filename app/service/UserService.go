@@ -321,7 +321,7 @@ func (this *UserService) UpdateAvatar(userId, avatarPath string) bool {
 	return db.UpdateByQField(db.Users, bson.M{"_id": userIdO}, "Logo", avatarPath)
 }
 
-//----------------------
+// ----------------------
 // 已经登录了的用户修改密码
 func (this *UserService) UpdatePwd(userId, oldPwd, pwd string) (bool, string) {
 	userInfo := this.GetUserInfo(userId)
@@ -437,7 +437,7 @@ func (this *UserService) UpdateLeftIsMin(userId string, leftIsMin bool) bool {
 	return db.UpdateByQMap(db.Users, bson.M{"_id": bson.ObjectIdHex(userId)}, bson.M{"LeftIsMin": leftIsMin})
 }
 
-//-------------
+// -------------
 // user admin
 func (this *UserService) ListUsers(pageNumber, pageSize int, sortField string, isAsc bool, email string) (page info.Page, users []info.User) {
 	users = []info.User{}

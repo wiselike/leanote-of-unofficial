@@ -409,7 +409,6 @@ func (c MemberBlog) uploadImage(themeId string) (re info.Re) {
 	return re
 }
 
-//
 // 使用主题
 func (c MemberBlog) ActiveTheme(themeId string) revel.Result {
 	re := info.NewRe()
@@ -519,8 +518,7 @@ func (c MemberBlog) NewTheme() revel.Result {
 	return c.Redirect("/member/blog/updateTheme?isNew=1&themeId=" + themeId)
 }
 
-//-----------
-//
+// -----------
 func (c MemberBlog) SetUserBlogBase(userBlog info.UserBlogBase) revel.Result {
 	re := info.NewRe()
 	re.Ok = blogService.UpdateUserBlogBase(c.GetUserId(), userBlog)

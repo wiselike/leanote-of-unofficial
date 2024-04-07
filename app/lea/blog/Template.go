@@ -150,7 +150,6 @@ func Init() {
 // name = index.html, search.html, cate.html, page.html
 // basePath 表未用户主题的基路径, 如/xxx/public/upload/32323232/themes/theme1, 如果没有, 则表示用自带的
 // isPreview 如果是, 错误提示则显示系统的 500 错误详情信息, 供debug
-//
 func RenderTemplate(name string, args map[string]interface{}, basePath string, isPreview bool) revel.Result {
 	var r *RenderTemplateResult
 	// 传来的主题路径为空, 则用系统的

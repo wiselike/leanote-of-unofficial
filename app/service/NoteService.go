@@ -832,7 +832,7 @@ func (this *NoteService) GetNotebookId(noteId string) bson.ObjectId {
 	return note.NotebookId
 }
 
-//------------------
+// ------------------
 // 搜索Note, 博客使用了
 func (this *NoteService) SearchNote(key, userId string, pageNumber, pageSize int, sortField string, isAsc, isBlog bool) (count int, notes []info.Note) {
 	notes = []info.Note{}
@@ -916,7 +916,7 @@ func (this *NoteService) searchNoteFromContent(notes []info.Note, userId, key st
 	return notes
 }
 
-//----------------
+// ----------------
 // tag搜索
 func (this *NoteService) SearchNoteByTags(tags []string, userId string, pageNumber, pageSize int, sortField string, isAsc bool) (count int, notes []info.Note) {
 	notes = []info.Note{}
@@ -939,7 +939,7 @@ func (this *NoteService) SearchNoteByTags(tags []string, userId string, pageNumb
 	return
 }
 
-//------------
+// ------------
 // 统计
 func (this *NoteService) CountNote(userId string) int {
 	q := bson.M{"IsTrash": false, "IsDeleted": false}

@@ -89,10 +89,10 @@ func (s *SourceInfoProcessor) processPackage(p *packages.Package) (sourceInfo *m
 // Scan app source code for calls to X.Y(), where X is of type *Validation.
 //
 // Recognize these scenarios:
-// - "Y" = "Validation" and is a member of the receiver.
-//   (The common case for inline validation)
-// - "X" is passed in to the func as a parameter.
-//   (For structs implementing Validated)
+//   - "Y" = "Validation" and is a member of the receiver.
+//     (The common case for inline validation)
+//   - "X" is passed in to the func as a parameter.
+//     (For structs implementing Validated)
 //
 // The line number to which a validation call is attributed is that of the
 // surrounding ExprStmt.  This is so that it matches what runtime.Callers()

@@ -157,7 +157,7 @@ func (c BaseController) GetTotalPage(page, count int) int {
 	return int(math.Ceil(float64(count) / float64(page)))
 }
 
-//-------------
+// -------------
 func (c BaseController) E404() revel.Result {
 	c.ViewArgs["title"] = "404"
 	return c.NotFound("", nil)
