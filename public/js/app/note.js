@@ -399,7 +399,8 @@ Note.curChangedSaveIt = function(force, callback, isRefreshOrCtrls) {
 	var me = this;
 	// 如果当前没有笔记, 不保存
 	// 或者是共享的只读笔记
-	if(!Note.curNoteId || Note.isReadOnly) {
+	// 或者未进入编辑模式
+	if(!Note.curNoteId || Note.isReadOnly || LEA.readOnly) {
 		// log(!Note.curNoteId ? '无当前笔记' : '共享只读');
 		return;
 	}
