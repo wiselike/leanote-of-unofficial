@@ -4,8 +4,10 @@
 * push to mainline as needed
 * with experimental features
 * with full ChangeLogs
+* provide deploy method by Docker Container
+* provide full develop environment by Docker Container
 
-  
+
 
 # ChangeLogs
 1. searched from https://github.com/wiselike/leanote-of-unofficial  
@@ -52,7 +54,7 @@
 36. 自研：修复在写作模式下，置顶按钮显示错误的bug。并添加置顶按钮的blog页面跳转功能(同blog按钮一样，鼠标点击后跳转到blog页面)。
 36. 自研：[修复图片、附件时，会同时插入域名到笔记中的故障](https://github.com/wiselike/leanote-of-unofficial/pull/3)，这会导致后续没法修改网站域名
 37. 自研：修复“未编辑笔记，笔记的更新时间却被刷新了”的故障。
-
+38. 核心：新增**一键容器部署方法**、**自编译环境搭建**方法
 
 
 
