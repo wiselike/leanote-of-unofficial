@@ -4,10 +4,12 @@
 * push to mainline as needed
 * with experimental features
 * with full ChangeLogs
-* provide deploy method by Docker Container
-* provide full develop environment by Docker Container
+* [provide deploy method by Docker Container](https://github.com/wiselike/leanote-of-unofficial-nolicensed/wiki/docker-deploy-method-docker一键部署方法--Linux)
+* [provide full develop environment by Docker Container](https://github.com/wiselike/leanote-of-unofficial-nolicensed/wiki/how-to-build-in-docker-docker编译环境搭建方法--Linux)
 
-
+# 注意事项
+* 代码合并请求，必须一次commit一个独立完整功能，请不要随意PR。
+* 若代码无法review，只能拒绝合入，请配合，谢谢。
 
 # ChangeLogs
 1. searched from https://github.com/wiselike/leanote-of-unofficial  
