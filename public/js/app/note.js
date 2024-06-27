@@ -690,6 +690,8 @@ Note.changeNote = function(selectNoteId, isShare, needSaveChanged, callback) {
 		callback && callback(ret);
 	}
 	
+	Notebook.changeNotebookNav(cacheNote.NotebookId, true);
+
 	if(cacheNote.Content) {
 		setContent(cacheNote, seq);
 		return;

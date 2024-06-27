@@ -525,6 +525,16 @@ Notebook.changeNotebookNavForNewNote = function(notebookId, title) {
 	if(!title) {
 		var notebook = Notebook.cache[0];
 		title = notebook.Title;
+	} else {
+		var titles = [];
+		var notebook = Notebook.cache[notebookId];
+		while (notebook) {
+			// 将当前notebook的标题添加到数组前面。
+			titles.unshift(notebook.Title);
+			if (!notebook.ParentNotebookId) break;
+			notebook = Notebook.cache[notebook.ParentNotebookId];
+		}
+		title = titles.join(" > ");
 	}
 	
 	if(!Notebook.isAllNotebookId(notebookId) && !Notebook.isTrashNotebookId(notebookId)) {
@@ -558,7 +568,7 @@ Notebook.toggleToMyNav = function(userId, notebookId) {
 	// 搜索tag隐藏
 	$("#tagSearch").hide();
 };
-Notebook.changeNotebookNav = function(notebookId) {
+Notebook.changeNotebookNav = function(notebookId, skipList) {
 	Notebook.curNotebookId = notebookId;
 	Notebook.toggleToMyNav();
 	
@@ -572,7 +582,9 @@ Notebook.changeNotebookNav = function(notebookId) {
 	}
 	
 	// 2
-	$("#curNotebookForListNote").html(notebook.Title);
+	if(!skipList) {
+		$("#curNotebookForListNote").html(notebook.Title);
+	}
 	
 	// 3
 	Notebook.changeNotebookNavForNewNote(notebookId, notebook.Title);
