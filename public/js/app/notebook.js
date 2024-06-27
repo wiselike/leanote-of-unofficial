@@ -525,6 +525,16 @@ Notebook.changeNotebookNavForNewNote = function(notebookId, title) {
 	if(!title) {
 		var notebook = Notebook.cache[0];
 		title = notebook.Title;
+	} else {
+		var titles = [];
+		var notebook = Notebook.cache[notebookId];
+		while (notebook) {
+			// 将当前notebook的标题添加到数组前面。
+			titles.unshift(notebook.Title);
+			if (!notebook.ParentNotebookId) break;
+			notebook = Notebook.cache[notebook.ParentNotebookId];
+		}
+		title = titles.join(" > ");
 	}
 	
 	if(!Notebook.isAllNotebookId(notebookId) && !Notebook.isTrashNotebookId(notebookId)) {
