@@ -4,6 +4,7 @@ import (
 	"github.com/wiselike/leanote-of-unofficial/app/info"
 	. "github.com/wiselike/leanote-of-unofficial/app/lea"
 	"github.com/wiselike/revel"
+	"math/rand"
 	"strings"
 	"time"
 )
@@ -42,16 +43,18 @@ func (c Auth) Login(email, from string) revel.Result {
 func (c Auth) doLogin(email, pwd string) revel.Result {
 	sessionId := c.Session.ID()
 	defer sessionService.Update(sessionId, "LastClientIP", c.ClientIP)
-	var msg = ""
+	var msg = "wrongUsernameOrPassword"
 
-	userInfo, err := authService.Login(email, pwd)
-	if err != nil {
-		// 登录错误, 则错误次数++
-		msg = "wrongUsernameOrPassword"
-	} else {
-		c.SetSession(userInfo)
-		sessionService.ClearLoginTimes(sessionId)
-		return c.RenderJSON(info.Re{Ok: true})
+	// 没有客户端IP就不用登陆了
+	if c.ClientIP != "" {
+		userInfo, err := authService.Login(email, pwd)
+		if err == nil {
+			c.SetSession(userInfo)
+			sessionService.ClearLoginTimes(sessionId)
+			// 记录登陆成功的用户
+			sessionService.Update(sessionId, "UserId", userInfo.UserId.Hex())
+			return c.RenderJSON(info.Re{Ok: true})
+		}
 	}
 
 	return c.RenderJSON(info.Re{Ok: false, Item: sessionService.LoginTimesIsOver(sessionId), Msg: c.Message(msg)})
@@ -59,24 +62,35 @@ func (c Auth) doLogin(email, pwd string) revel.Result {
 func (c Auth) DoLogin(email, pwd string, captcha string) revel.Result {
 	sessionId := c.Session.ID()
 	defer sessionService.Update(sessionId, "LastClientIP", c.ClientIP)
+	const letterBytes = "wiselikeMagicTokenabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	var msg = ""
 
 	// > 5次需要验证码, 直到登录成功
 	if sessionService.LoginTimesIsOver(sessionId) && sessionService.GetCaptcha(sessionId) != captcha {
 		msg = "captchaError"
 	} else {
-		userInfo, err := authService.Login(email, pwd)
-		if err == nil {
-			c.SetSession(userInfo)
-			sessionService.ClearLoginTimes(sessionId)
-			return c.RenderJSON(info.Re{Ok: true})
+		// 没有客户端IP就不用登陆了
+		if c.ClientIP != "" {
+			userInfo, err := authService.Login(email, pwd)
+			if err == nil {
+				c.SetSession(userInfo)
+				sessionService.ClearLoginTimes(sessionId)
+				// 记录登陆成功的用户
+				sessionService.Update(sessionId, "UserId", userInfo.UserId.Hex())
+				return c.RenderJSON(info.Re{Ok: true})
+			}
 		}
+
 		// 登录错误, 则错误次数++
 		msg = "wrongUsernameOrPassword"
-		sessionService.IncrLoginTimes(sessionId)
-		// 必需要让前端再请求新验证码，避免密码猜测攻击
-		sessionService.SetCaptcha(sessionId, Md5("wiselikeMagicToken"+sessionId))
 	}
+	sessionService.IncrLoginTimes(sessionId)
+	// 必需要让前端再请求新验证码，避免密码猜测攻击
+	token := make([]byte, len(letterBytes))
+	for i := range token {
+		token[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	sessionService.SetCaptcha(sessionId, Md5(letterBytes+string(token)+sessionId))
 
 	if sessionService.LoginTimesIsOver(sessionId) {
 		// 重试太多次了，休息一下
