@@ -45,7 +45,8 @@ func (this *SessionService) Get(sessionId string) info.Session {
 // 登录错误时间是否已超过了
 func (this *SessionService) LoginTimesIsOver(sessionId string) bool {
 	session := this.Get(sessionId)
-	return session.LoginTimes > 5
+	// >= 3次需要验证码, 直到登录成功
+	return session.LoginTimes > 3
 }
 
 // 登录成功后清空错误次数

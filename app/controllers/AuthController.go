@@ -55,6 +55,7 @@ func (c Auth) doLogin(email, pwd string) revel.Result {
 			sessionService.Update(sessionId, "UserId", userInfo.UserId.Hex())
 			return c.RenderJSON(info.Re{Ok: true})
 		}
+		revel.AppLog.Warnf("username or password is incorrect.\t\tip=%s", c.ClientIP)
 	}
 
 	return c.RenderJSON(info.Re{Ok: false, Item: sessionService.LoginTimesIsOver(sessionId), Msg: c.Message(msg)})
@@ -65,7 +66,7 @@ func (c Auth) DoLogin(email, pwd string, captcha string) revel.Result {
 	const letterBytes = "wiselikeMagicTokenabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	var msg = ""
 
-	// > 5次需要验证码, 直到登录成功
+	// >= 3次需要验证码, 直到登录成功
 	if sessionService.LoginTimesIsOver(sessionId) && sessionService.GetCaptcha(sessionId) != captcha {
 		msg = "captchaError"
 	} else {
@@ -83,8 +84,9 @@ func (c Auth) DoLogin(email, pwd string, captcha string) revel.Result {
 
 		// 登录错误, 则错误次数++
 		msg = "wrongUsernameOrPassword"
+		revel.AppLog.Warnf("username or password is incorrect.\t\tip=%s", c.ClientIP)
 	}
-	sessionService.IncrLoginTimes(sessionId)
+	sessionService.IncrLoginTimes(sessionId) // 此函数在return里的函数执行之后执行
 	// 必需要让前端再请求新验证码，避免密码猜测攻击
 	token := make([]byte, len(letterBytes))
 	for i := range token {
