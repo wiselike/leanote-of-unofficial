@@ -271,15 +271,13 @@ func (c File) CopyHttpImage(src string) revel.Result {
 	}
 
 	// File
-	fileInfo := info.File{Name: filename,
+	fileInfo := info.File{FileId: bson.NewObjectId(),
+		Name:  filename,
 		Title: filename,
-		Path:  fileUrlPath + "/" + filename,
+		Path:  path.Join(fileUrlPath, filename),
 		Size:  filesize}
 
-	id := bson.NewObjectId()
-	fileInfo.FileId = id
-
-	re.Id = id.Hex()
+	re.Id = fileInfo.FileId.Hex()
 	//	re.Item = fileInfo.Path
 	re.Ok, re.Msg = fileService.AddImage(fileInfo, "", c.GetUserId(), true)
 

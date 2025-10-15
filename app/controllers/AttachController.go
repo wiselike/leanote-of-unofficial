@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"github.com/wiselike/revel"
-	//	"encoding/json"
 	"archive/tar"
 	"compress/gzip"
 	"fmt"
@@ -13,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wiselike/revel"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/wiselike/leanote2/app/info"
@@ -82,7 +81,7 @@ func (c Attach) uploadAttach(noteId string) (re info.Re) {
 	filename := handel.Filename
 	_, ext := SplitFilename(filename) // .doc
 	filename = NewGuid() + ext
-	toPath := dir + "/" + filename
+	toPath := path.Join(dir, filename)
 	err = ioutil.WriteFile(toPath, data, 0777)
 	if err != nil {
 		return re
@@ -94,17 +93,16 @@ func (c Attach) uploadAttach(noteId string) (re info.Re) {
 		fileType = strings.ToLower(ext[1:])
 	}
 	filesize := GetFilesize(toPath)
-	fileInfo = info.Attach{Name: filename,
+	fileInfo = info.Attach{AttachId: bson.NewObjectId(),
+		Name:         filename,
 		Title:        handel.Filename,
 		NoteId:       bson.ObjectIdHex(noteId),
 		UploadUserId: c.GetObjectUserId(),
-		Path:         filePath + "/" + filename,
+		Path:         path.Join(filePath, filename),
 		Type:         fileType,
 		Size:         filesize}
 
-	id := bson.NewObjectId()
-	fileInfo.AttachId = id
-	fileId = id.Hex()
+	fileId = fileInfo.AttachId.Hex()
 	Ok, resultMsg = attachService.AddAttach(fileInfo, false)
 	if resultMsg != "" {
 		resultMsg = c.Message(resultMsg)

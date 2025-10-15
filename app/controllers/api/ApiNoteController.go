@@ -308,6 +308,9 @@ func (c ApiNote) AddNote(noteOrContent info.ApiNote) revel.Result {
 		note.Desc = SubStringHTMLToRaw(noteContent.Abstract, 200)
 	}
 
+	noteImageService.ReOrganizeImageFiles(c.getUserId(), noteId.Hex(), noteOrContent.Title, &noteContent.Content, false)
+	attachService.ReOrganizeAttachFiles(c.getUserId(), noteId.Hex(), noteOrContent.Title)
+
 	note = noteService.AddNoteAndContentApi(note, noteContent, myUserId)
 
 	if note.NoteId == "" {
@@ -486,6 +489,17 @@ func (c ApiNote) UpdateNote(noteOrContent info.ApiNote) revel.Result {
 			re.Msg = noteMsg
 			return c.RenderJSON(re)
 		}
+	}
+
+	if c.Has("Title") && !c.Has("Content") {
+		noteImageService.ReOrganizeImageFiles(c.getUserId(), noteOrContent.NoteId, noteOrContent.Title, &noteOrContent.Content, true)
+		attachService.ReOrganizeAttachFiles(c.getUserId(), noteOrContent.NoteId, noteOrContent.Title)
+	} else if c.Has("Content") {
+		if !c.Has("Title") {
+			noteOrContent.Title = noteService.GetNote(noteOrContent.NoteId, c.getUserId()).Title
+		}
+		noteImageService.ReOrganizeImageFiles(c.getUserId(), noteOrContent.NoteId, noteOrContent.Title, &noteOrContent.Content, false)
+		attachService.ReOrganizeAttachFiles(c.getUserId(), noteOrContent.NoteId, noteOrContent.Title)
 	}
 
 	//-------------
