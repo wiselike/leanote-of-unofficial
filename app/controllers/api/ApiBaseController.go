@@ -80,9 +80,9 @@ func (c ApiBaseContrller) uploadAttach(name string, noteId string) (ok bool, msg
 	}
 
 	// 生成上传路径
-	newGuid := NewGuid()
-	filePath := GetRandomFilePath(userId, newGuid) + "/attachs"
-
+	title := noteService.GetNote(noteId, c.getUserId()).Title
+	title = FixFilename(title)
+	filePath := path.Join(c.getUserId(), "attachs", title)
 	dir := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], filePath)
 	err := os.MkdirAll(dir, 0755)
 	if err != nil {
@@ -91,7 +91,7 @@ func (c ApiBaseContrller) uploadAttach(name string, noteId string) (ok bool, msg
 	// 生成新的文件名
 	filename := handel.Filename
 	_, ext := SplitFilename(filename) // .doc
-	filename = newGuid + ext
+	filename = NewGuid() + ext
 	toPath := path.Join(dir, filename)
 	err = ioutil.WriteFile(toPath, data, 0777)
 	if err != nil {
@@ -143,7 +143,7 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 	newGuid := NewGuid()
 	// 生成上传路径
 	userId := c.getUserId()
-	fileUrlPath := GetRandomFilePath(userId, newGuid) + "/images"
+	fileUrlPath := GetRandomFilePath(userId, newGuid) + "/images-tmp"
 
 	dir := path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], fileUrlPath)
 	err := os.MkdirAll(dir, 0755)
@@ -183,7 +183,7 @@ func (c ApiBaseContrller) upload(name string, noteId string, isAttach bool) (ok 
 		return
 	}
 	// 改变成gif图片
-	_, toPathGif := TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins", c.GetUserId(), time.Now().Format("2006")))
+	_, toPathGif := TransPicture(toPath, path.Join(service.ConfigS.GlobalStringConfigs["files.dir"], "backup-origins", c.getUserId(), time.Now().Format("2006")))
 	filename = GetFilename(toPathGif)
 	filesize := GetFilesize(toPathGif)
 

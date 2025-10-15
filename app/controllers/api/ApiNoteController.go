@@ -308,6 +308,9 @@ func (c ApiNote) AddNote(noteOrContent info.ApiNote) revel.Result {
 		note.Desc = SubStringHTMLToRaw(noteContent.Abstract, 200)
 	}
 
+	noteImageService.ReOrganizeImageFiles(c.getUserId(), noteId.Hex(), noteOrContent.Title, &noteContent.Content, false)
+	attachService.ReOrganizeAttachFiles(c.getUserId(), noteId.Hex(), noteOrContent.Title)
+
 	note = noteService.AddNoteAndContentApi(note, noteContent, myUserId)
 
 	if note.NoteId == "" {
@@ -488,13 +491,27 @@ func (c ApiNote) UpdateNote(noteOrContent info.ApiNote) revel.Result {
 		}
 	}
 
+	if c.Has("Content") {
+		// 把fileId替换下
+		c.fixPostNotecontent(&noteOrContent)
+	}
+
+	if c.Has("Title") && !c.Has("Content") {
+		noteImageService.ReOrganizeImageFiles(c.getUserId(), noteOrContent.NoteId, noteOrContent.Title, &noteOrContent.Content, true)
+		attachService.ReOrganizeAttachFiles(c.getUserId(), noteOrContent.NoteId, noteOrContent.Title)
+	} else if c.Has("Content") {
+		if !c.Has("Title") {
+			noteOrContent.Title = noteService.GetNote(noteOrContent.NoteId, c.getUserId()).Title
+		}
+		noteImageService.ReOrganizeImageFiles(c.getUserId(), noteOrContent.NoteId, noteOrContent.Title, &noteOrContent.Content, false)
+		attachService.ReOrganizeAttachFiles(c.getUserId(), noteOrContent.NoteId, noteOrContent.Title)
+	}
+
 	//-------------
 	afterContentUsn := 0
 	contentOk := false
 	contentMsg := ""
 	if c.Has("Content") {
-		// 把fileId替换下
-		c.fixPostNotecontent(&noteOrContent)
 		// 如果传了Abstract就用之
 		if noteOrContent.Abstract == "" {
 			noteOrContent.Abstract = SubStringHTML(noteOrContent.Content, 200, "")
