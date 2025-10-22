@@ -15,7 +15,7 @@ fmt:
 # only build temporarily
 build:
 	@rm -rf tmp/
-	CGO_ENABLED=0 revel build . tmp/
+	CGO_ENABLED=0 GOFLAGS='-gcflags=all=-N -gcflags=all=-l' revel build . tmp/
 
 # build js
 gulp:

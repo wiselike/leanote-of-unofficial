@@ -145,6 +145,9 @@ func (c ApiNote) GetNoteAndContent(noteId string) revel.Result {
 	return c.RenderJSON(apiNote)
 }
 
+var imgTag = regexp.MustCompile(`<img\b[^>]*>`)
+var dropAttr = regexp.MustCompile(`\s*data-mce-src\s*=\s*"[^"]*"`)
+
 // content里的image, attach链接是
 // https://leanote.com/api/file/getImage?fileId=xx
 // https://leanote.com/api/file/getAttach?fileId=xx
@@ -165,11 +168,6 @@ func (c ApiNote) fixPostNotecontent(noteOrContent *info.ApiNote) {
 					reg, _ := regexp.Compile(`https*://[^/]*?/api/file/getImage\?fileId=` + file.LocalFileId)
 					// Log(reg)
 					noteOrContent.Content = reg.ReplaceAllString(noteOrContent.Content, `/api/file/getImage?fileId=`+file.FileId)
-
-					// // "http://a.com/api/file/getImage?fileId=localId" => /api/file/getImage?fileId=serverId
-					// noteOrContent.Content = strings.Replace(noteOrContent.Content,
-					// 	baseUrl + "/api/file/getImage?fileId="+file.LocalFileId,
-					// 	"/api/file/getImage?fileId="+file.FileId, -1)
 				} else {
 					reg, _ := regexp.Compile(`https*://[^/]*?/api/file/getAttach\?fileId=` + file.LocalFileId)
 					// Log(reg)
@@ -182,6 +180,12 @@ func (c ApiNote) fixPostNotecontent(noteOrContent *info.ApiNote) {
 				}
 			}
 		}
+
+		// 删除data-mce-src属性，因为客户端传上来的是LocalFileId非FileId，是错误的。
+		// 此处就无需再更正了，直接删除属性即可。删除所有单个 <img> 标签内的 data-mce-src="..."
+		noteOrContent.Content = imgTag.ReplaceAllStringFunc(noteOrContent.Content, func(tag string) string {
+			return dropAttr.ReplaceAllString(tag, "")
+		})
 	}
 }
 
